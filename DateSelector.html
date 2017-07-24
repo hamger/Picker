@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="screen-orientation" content="portrait">
+    <title>DateSelector</title>
+    <link rel="stylesheet" type="text/css" href="./DateSelector.css" />
+    <style>
+        body {
+            background-color: #fafafa;
+        }
+
+        h3 {
+            position: relative;
+            width: 100%;
+            height: 50px;
+            line-height: 50px;
+            text-align: center;
+            color: #555;
+        }
+
+        h3:after {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 5px;
+            left: 50%;
+            bottom: 0;
+            margin: 0 -50px;
+            background: #ddd;
+            border-radius: 10px;
+        }
+
+        article {
+            color: #333;
+            line-height: 1.3;
+            padding: 0 30px;
+            margin: 20px 0;
+        }
+
+        input {
+            display: block;
+            width: 200px;
+            margin: 5px auto 10px;
+            padding: 5px 20px;
+            border: 1px solid #cbcbcb;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <h3>dateSelector</h3>
+    <article>
+        <input id="date-selector-input" type="text" placeholder="选择年月日" value="" disabled/>
+    </article>
+    <h3>timeSelector</h3>
+    <article>
+        <input id="date-selector-input2" type="text" placeholder="选择时分" value="" disabled/>
+    </article>
+    <h3>dateTimeSelector</h3>
+    <article>
+        <input id="date-selector-input3" type="text" placeholder="选择选择年月日时分" value="" disabled/>
+    </article> 
+
+    <script src="./DateSelector.js"></script>
+    <script>
+        new DateSelector({
+            inputId: 'date-selector-input', // 目标 input 元素ID
+            success: function (arr) { // 回调函数
+                console.log(arr);
+                document.getElementById('date-selector-input').value = arr;
+            }
+        });
+        new DateSelector({
+            inputId: 'date-selector-input2',
+            begin_year: 2000, // 开始年份
+            end_year: 2020, // 结束年份
+            type: 'time', // 选择器类型
+            hasSuffix: 'no', // 不添加时间单位
+            hasZero: 'no', // 单位数不显两位
+            success: function (arr) {
+                console.log(arr);
+                document.getElementById('date-selector-input2').value = arr;
+            }
+        });
+        new DateSelector({
+            inputId: 'date-selector-input3',
+            type: 'dateTime',
+            success: function (arr) {
+                console.log(arr);
+                document.getElementById('date-selector-input3').value = arr;
+            }
+        });
+    </script>
+
+</body>
+
+</html>
