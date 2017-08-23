@@ -1,10 +1,7 @@
 /**
  * Created by Hanger on 2017/7/18.
  */
-(function (wid, doc) {
-	var win = wid;
-	var doc = doc;
-
+(function (win, doc) {
 	// 以id获取dom元素
 	function $id(id) {
 		return doc.getElementById(id);
@@ -30,7 +27,7 @@
 		this.begin_year = config.begin_year || new Date().getFullYear() - 10; // 起始年份，选填
 		this.end_year = config.end_year || new Date().getFullYear() + 10; // 结束年份，选填
 		this.hasSuffix = config.hasSuffix || 'yes'; // 是否添加时间单位，选填
-		this.hasZero = config.hasZero || 'yes'; // 单位数是否显示两位，选填
+		this.hasZero = config.hasZero || 'yes'; // 一位数是否显示两位，选填
 		this.success = config.success; // 回调函数，必填
 		this.initTab(); // 初始化标签
 		this.initUI(); // 初始化UI
@@ -328,6 +325,7 @@
 						that.methods().changedLocation(2)
 					}
 				}
+				that.methods().position(2);
 			},
 			// 改变列表 li 个数并返回日期的数组
 			calcDays: function (year, month) {
@@ -390,7 +388,7 @@
 				}
 				return arr2
 			},
-			// 单位数显示为两位
+			// 一位数显示为两位
 			addZero:function(num){
 				if(num < 10){
 					num = '0' + num 
