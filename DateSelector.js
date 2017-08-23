@@ -323,9 +323,9 @@
 					if(!(that.preDay in that.dayArr)){ // 如果前一次操作的日期不在当前的日期列表中(比如31号不在小月，30号不在2月)，进行置底
 						that.curDis[2] = that.liHeight * (that.liNum[2] - 1)
 						that.methods().changedLocation(2)
+						that.methods().position(2)
 					}
 				}
-				that.methods().position(2);
 			},
 			// 改变列表 li 个数并返回日期的数组
 			calcDays: function (year, month) {
