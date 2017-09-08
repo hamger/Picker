@@ -1,4 +1,4 @@
-# selector
+# Selector
 移动端的日期和地址选择器
 ## Demo
 [点击这里可跳转到演示页面](https://hamger.github.io/demo/myDateSelector/DateSelector.html)，请在移动端打开或者使用浏览器移动端调试工具打开。 
