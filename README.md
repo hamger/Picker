@@ -62,4 +62,4 @@ new SpaceSelector({
       }
   });
 ```
-但是需要注意传入的json数据的格式，格式请参考 SpaceDate.js 文件中的格式。
+但是需要注意传入的json数据的格式，格式请参考 SpaceData.js 文件中的格式。
