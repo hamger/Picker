@@ -5,9 +5,12 @@
 ## 快速使用 
 首先引入文件
 ```html
-<link rel="stylesheet" type="text/css" href="./DateSelector.css" /> // 公共css样式
-<script src="./DateSelector.js"></script> // 使用日期选择器需要引入的js文件
-<script src="./SpaceSelector.js"></script> // 使用地址选择器需要引入的js文件
+<!-- 日期和地址选择器公共css样式 -->
+<link rel="stylesheet" type="text/css" href="./DateSelector.css" />
+<!-- 使用日期选择器需要引入的js文件 -->
+<script src="./DateSelector.js"></script>
+<!-- 使用地址选择器需要引入的js文件 -->
+<script src="./SpaceSelector.js"></script>
 ```
 使用日期选择器，在js文件中写入如下代码
 ```js
