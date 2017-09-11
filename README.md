@@ -6,11 +6,11 @@
 首先引入文件
 ```html
 <!-- 日期和地址选择器公共css样式 -->
-<link rel="stylesheet" type="text/css" href="./DateSelector.css" />
+<link rel="stylesheet" type="text/css" href="./selector.css" />
 <!-- 使用日期选择器需要引入的js文件 -->
-<script src="./DateSelector.js"></script>
+<script src="./dateSelector.js"></script>
 <!-- 使用地址选择器需要引入的js文件 -->
-<script src="./SpaceSelector.js"></script>
+<script src="./spaceSelector.js"></script>
 ```
 使用日期选择器，在js文件中写入如下代码
 ```js
@@ -33,7 +33,7 @@ new SpaceSelector({
       }
   });
 ```
-关于如何使用你还可以参考 Selector.html 文件。
+关于如何使用你还可以参考 selector.html 文件。
 ## 日期选择器配置项
 传入不同的配置项可以实现不同的效果
 ```js
@@ -62,4 +62,4 @@ new SpaceSelector({
       }
   });
 ```
-但是需要注意传入的json数据的格式，格式请参考 SpaceData.js 文件中的格式。
+但是需要注意传入的json数据的格式，格式请参考 city.js 文件中的数据格式。
