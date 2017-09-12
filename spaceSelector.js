@@ -1,15 +1,19 @@
 /**
  * Created by Hanger on 2017/8/31.
  */
-(function(win, doc) {
+(function (global, factory) {
+    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+    typeof define === 'function' && define.amd ? define(factory) :
+    (global.SpaceSelector = factory());
+}(this, (function() {
     // 以id获取dom元素
     function $id(id) {
-        return doc.getElementById(id);
+        return document.getElementById(id);
     }
 
     // 以class获取DOM元素
     function $class(name) {
-        return doc.getElementsByClassName(name);
+        return document.getElementsByClassName(name);
     }
 
     // 移除子元素
@@ -51,11 +55,11 @@
         this.spaceUl = []; // 每个ul元素
         this.curDis = []; // 每个ul当前偏离的距离
         this.curPos = []; // 记录 touchstart 时每个ul的竖向距离
- 		this.startY = 0; // touchstart的位置
-		this.startTime = 0; // touchstart的时间
-		this.endY = 0; // touchend的位置 
-		this.endTime = 0; // touchend的时间 
-		this.moveY = 0; // touchmove的位置
+        this.startY = 0; // touchstart的位置
+        this.startTime = 0; // touchstart的时间
+        this.endY = 0; // touchend的位置 
+        this.endTime = 0; // touchend的时间 
+        this.moveY = 0; // touchmove的位置
 
         this.bg = 'date-selector-bg-' + this.containerId // 选择器背景ID 
         this.inContainer = 'date-selector-container-' + this.containerId // 内部选择器容器ID
@@ -101,7 +105,7 @@
         })
 
         // 点击背景隐藏选择器
-       	bg.addEventListener('touchstart', function(e) {
+        bg.addEventListener('touchstart', function(e) {
             if (e.target.id == 'date-selector-bg-' + that.containerId) {
                 that.methods().hide(bg, container)
             }
@@ -120,23 +124,23 @@
                 that.container = $id(that.containerId);
             },
             /*
-	        Function	: 获取每列的对象数组
-	        Return      : Null
-	        Explain    	: @arr 当前列的对象数组
-	        	@index 当前列被选中元素的索引
-	        	@i 当前操作列索引
-	        */
+            Function    : 获取每列的对象数组
+            Return      : Null
+            Explain     : @arr 当前列的对象数组
+                @index 当前列被选中元素的索引
+                @i 当前操作列索引
+            */
             getData: function(arr, index, i) {
                 var obj = arr[index]
                 if ('child' in obj && obj.child.length > 0) {
-                	that.relatedData[i+1] = obj.child
-                	that.renderCount++
+                    that.relatedData[i+1] = obj.child
+                    that.renderCount++
                     that.methods().getData(obj.child, 0, ++i)
                 }
             },
             // 处理与对象数据相关联的数据 
             dealData: function(i) {
-            	that.ulCount = i + that.renderCount + 1
+                that.ulCount = i + that.renderCount + 1
                 for (var j = i + 1; j < that.ulCount; j++) {
                     that.displayedData[j] = that.methods().getValue(that.relatedData[j])
                     that.liNum[j] = that.relatedData[j].length
@@ -144,10 +148,10 @@
                 that.ulWidth = (100 / that.ulCount).toFixed(2)
             },
             /*
-	        Function    : 获取对象数组的 value 值
-	        Return      : Array
-	        Explain 	: @arr 需要被解析的对象数组
-	        */
+            Function    : 获取对象数组的 value 值
+            Return      : Array
+            Explain     : @arr 需要被解析的对象数组
+            */
             getValue: function(arr) {
                 var tempArr = []
                 for (var i = 0; i < arr.length; i++) {
@@ -219,48 +223,48 @@
             // 滚动改变位置 
             roll: function(i, time) {
                 if (that.curDis[i] >= 0) {
-					that.spaceUl[i].style.transform =  'translate3d(0,-' + that.curDis[i] + 'px, 0)';
-					that.spaceUl[i].style.webkitTransform =  'translate3d(0,-' + that.curDis[i] + 'px, 0)';
-				} else {
-					that.spaceUl[i].style.transform = 'translate3d(0,' +  Math.abs(that.curDis[i]) + 'px, 0)';
-					that.spaceUl[i].style.webkitTransform = 'translate3d(0,' +  Math.abs(that.curDis[i]) + 'px, 0)';
-				}
-				if (time) {
-					that.spaceUl[i].style.transition = 'transform ' + time + 's ease-out';
-					that.spaceUl[i].style.webkitTransition = '-webkit-transform ' + time + 's ease-out';
-				}
+                    that.spaceUl[i].style.transform =  'translate3d(0,-' + that.curDis[i] + 'px, 0)';
+                    that.spaceUl[i].style.webkitTransform =  'translate3d(0,-' + that.curDis[i] + 'px, 0)';
+                } else {
+                    that.spaceUl[i].style.transform = 'translate3d(0,' +  Math.abs(that.curDis[i]) + 'px, 0)';
+                    that.spaceUl[i].style.webkitTransform = 'translate3d(0,' +  Math.abs(that.curDis[i]) + 'px, 0)';
+                }
+                if (time) {
+                    that.spaceUl[i].style.transition = 'transform ' + time + 's ease-out';
+                    that.spaceUl[i].style.webkitTransition = '-webkit-transform ' + time + 's ease-out';
+                }
             },
             // 时间选择器触摸事件
             touch: function(i) {
                 var event = event || window.event;
-				event.preventDefault();
-				switch (event.type) {
-					case "touchstart":
-						that.startY = event.touches[0].clientY;
-						that.startTime = new Date()
-						that.curPos[i] = that.curDis[i]; // 记录当前位置
-						break;
-					case "touchend":
-						that.endTime = new Date()
-						if (that.endTime - that.startTime < 150) { // 点击跳入下一项
-							that.curDis[i] = that.curPos[i] + that.liHeight;
-						}	 
-						that.methods().fixate(i);
-						that.methods().roll(i, 0.2);
-						break;
-					case "touchmove":
-						event.preventDefault();
-						that.moveY = event.touches[0].clientY;
-						that.curDis[i] = that.startY - that.moveY + that.curPos[i];
-						if (that.curDis[i] <= -1.5 * that.liHeight) {
-							that.curDis[i] = -1.5 * that.liHeight
-						}
-						if (that.curDis[i] >= (that.liNum[i] - 1 + 1.5) * that.liHeight) {
-							that.curDis[i] = (that.liNum[i] - 1 + 1.5) * that.liHeight
-						}
-						that.methods().roll(i);
-						break;
-				}
+                event.preventDefault();
+                switch (event.type) {
+                    case "touchstart":
+                        that.startY = event.touches[0].clientY;
+                        that.startTime = new Date()
+                        that.curPos[i] = that.curDis[i]; // 记录当前位置
+                        break;
+                    case "touchend":
+                        that.endTime = new Date()
+                        if (that.endTime - that.startTime < 150) { // 点击跳入下一项
+                            that.curDis[i] = that.curPos[i] + that.liHeight;
+                        }    
+                        that.methods().fixate(i);
+                        that.methods().roll(i, 0.2);
+                        break;
+                    case "touchmove":
+                        event.preventDefault();
+                        that.moveY = event.touches[0].clientY;
+                        that.curDis[i] = that.startY - that.moveY + that.curPos[i];
+                        if (that.curDis[i] <= -1.5 * that.liHeight) {
+                            that.curDis[i] = -1.5 * that.liHeight
+                        }
+                        if (that.curDis[i] >= (that.liNum[i] - 1 + 1.5) * that.liHeight) {
+                            that.curDis[i] = (that.liNum[i] - 1 + 1.5) * that.liHeight
+                        }
+                        that.methods().roll(i);
+                        break;
+                }
             },
             // 确定 ul 最终的位置、更新数据
             fixate: function(i) {
@@ -271,14 +275,14 @@
                 that.methods().updateUl(i);
                 that.methods().getCurDis();
                 for (var j = i; j < that.ulCount; j++) {
-                	that.methods().roll(j, 0.2);
+                    that.methods().roll(j, 0.2);
                 };
             },
             // 获取每列的竖向位置
             getCurDis:function () {
-            	for (var i = 0; i < that.ulCount; i++) {
-            	 	that.curDis[i] = that.spaceIndex[i] * that.liHeight
-        		};	
+                for (var i = 0; i < that.ulCount; i++) {
+                    that.curDis[i] = that.spaceIndex[i] * that.liHeight
+                };  
             },
             // 获取定位数据
             getPosition: function(i) {
@@ -298,7 +302,7 @@
             },
             // 更新 ul 列表中的数据
             updateUl: function(i) {
-            	var curUlCount = $id(that.content).children.length - 3
+                var curUlCount = $id(that.content).children.length - 3
                 if (that.ulCount == curUlCount) { // 列数不变的情况
                     for (var j = i + 1; j < that.ulCount; j++) {
                         that.methods().renderLi(j)
@@ -347,14 +351,5 @@
         }
     }
 
-    // 暴露接口
-    if (typeof exports == "object") {
-        module.exports = SpaceSelector;
-    } else if (typeof define == "function" && define.amd) {
-        define([], function() {
-            return SpaceSelector;
-        })
-    } else {
-        win.SpaceSelector = SpaceSelector;
-    }
-})(window, document);
+    return SpaceSelector;
+})))
