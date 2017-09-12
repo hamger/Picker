@@ -1,15 +1,19 @@
  /**
  * Created by Hanger on 2017/7/18.
  */
-(function (win, doc) {
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+	typeof define === 'function' && define.amd ? define(factory) :
+	(global.DateSelector = factory());
+}(this, (function () {
 	// 以id获取dom元素
 	function $id(id) {
-		return doc.getElementById(id);
+		return document.getElementById(id);
 	}
 
 	// 以class获取DOM元素
 	function $class(name) {
-		return doc.getElementsByClassName(name);
+		return document.getElementsByClassName(name);
 	}
 
 	// 移除子元素
@@ -397,14 +401,5 @@
 		}
 	}
 
-	// 暴露接口
-	if (typeof exports == "object") {
-		module.exports = DateSelector;
-	} else if (typeof define == "function" && define.amd) {
-		define([], function () {
-			return DateSelector;
-		})
-	} else {
-		win.DateSelector = DateSelector;
-	}
-})(window, document);
+	return DateSelector;
+})))
