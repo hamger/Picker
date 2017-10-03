@@ -1,0 +1,114 @@
+* {
+    padding: 0;
+    margin: 0;
+}
+
+.hg-picker-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: rgba(75, 75, 75, 0);
+    overflow: hidden;
+    transition: all .3s ease;
+    -webkit-transition: all .3s ease;
+    z-index: -99;
+}
+
+.hg-picker-bg-show {
+    z-index: 99 !important;
+    background: rgba(75, 75, 75, 0.65) !important;
+}
+
+.hg-picker-container {
+    width: 100%;
+    height: 256px;
+    position: absolute;
+    bottom: 0;
+    margin-left: 0;
+    background-color: #FFF;
+    overflow: hidden;
+    display: none;
+}
+
+.hg-picker-btn-box {
+    text-align: center;
+    width: 100%;
+    height: 44px;
+    line-height: 44px;
+    background: rgba(218, 218, 218, .7);
+}
+
+.hg-picker-btn {
+    margin: 0 20px;
+    color: #000;
+}
+
+.hg-picker-btn:nth-child(1) {
+    float: left;
+}
+
+.hg-picker-btn:nth-child(2) {
+    float: right;
+}
+
+.hg-picker-content {
+    background: #fff;
+    overflow: hidden;
+    position: relative;
+    height: 200px;
+    margin: 6px 0;
+}
+
+.hg-picker-content ul {
+    display: inline-block;
+    overflow: hidden;
+    position: relative;
+    top: 0;
+    vertical-align: top;
+}
+
+.hg-picker-content ul::-webkit-scrollbar {
+    display: none;
+}
+
+.hg-picker-content li {
+    height: 40px;
+    text-align: center;
+    font-size: 16px;
+    line-height: 40px;
+    list-style: none;
+    overflow: hidden;
+}
+
+
+.hg-picker-up-shadow,
+.hg-picker-down-shadow {
+    width: 100%;
+    height: 80px;
+    position: absolute;
+    pointer-events: none;
+}
+
+.hg-picker-up-shadow {
+    top: 0;
+    background-image: linear-gradient(to bottom, #FFF, rgba(255, 255, 255, 0));
+}
+
+.hg-picker-down-shadow {
+    bottom: 0;
+    background-image: linear-gradient(to top, #FFF, rgba(255, 255, 255, 0));
+}
+
+.hg-picker-line {
+    width: 96%;
+    height: 40px;
+    position: absolute;
+    top: 80px;
+    left: 2%;
+    pointer-events: none;
+    box-sizing: border-box;
+    border-top: 1px solid #DCDCDC;
+    border-bottom: 1px solid #DCDCDC;
+}

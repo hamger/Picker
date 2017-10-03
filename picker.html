@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="format-detection" content="telephone=no" />
     <meta name="screen-orientation" content="portrait">
-    <title>selector</title>
-    <link rel="shortcut icon" href="http://olislpb6q.bkt.clouddn.com/header.jpg" /> 
-    <link rel="stylesheet" type="text/css" href="./selector.css" />
+    <title>picker</title>
+    <link rel="shortcut icon" href="http://olislpb6q.bkt.clouddn.com/header.jpg" />
+    <link rel="stylesheet" type="text/css" href="./picker.css" />
     <style>
     body {
         background-color: #fff;
@@ -54,7 +54,7 @@
 </head>
 
 <body>
-    <h3>dateSelector</h3>
+    <h3>datePicker</h3>
     <article>
         <input id="date-input" type="text" placeholder="选择年月日" value="" disabled/>
     </article>
@@ -66,22 +66,28 @@
     <article>
         <input id="date-input3" type="text" placeholder="选择年月日时分" value="" disabled/>
     </article>
-    <h3>spaceSelector</h3>
+    <h3>spacePicker</h3>
     <article>
         <input id="space-input" type="text" placeholder="选择中国城市" value="" disabled/>
     </article>
-    <script src="./dateSelector.js"></script>
-    <script src="./spaceSelector.js"></script>
+    <script src="./datePicker.js"></script>
+    <script src="./spacePicker.js"></script>
     <script src="./city.js"></script>
     <script>
-    new DateSelector({
+    new DatePicker({
         inputId: 'date-input', // 目标DOM元素ID
+        style: {
+            bottom: '200px',
+            width: '95%',
+            btnLocation: 'bottom',
+            radius: '10px'
+        },
         success: function(arr) { // 回调函数
             console.log(arr);
             document.getElementById('date-input').value = arr;
         }
     });
-    new DateSelector({
+    new DatePicker({
         inputId: 'date-input2',
         type: 'time', // 选择器类型
         begin_year: 2000, // 开始年份
@@ -91,7 +97,7 @@
             document.getElementById('date-input2').value = arr;
         }
     });
-    new DateSelector({
+    new DatePicker({
         inputId: 'date-input3',
         type: 'dateTime',
         hasSuffix: 'no', // 不添加时间单位
@@ -101,8 +107,13 @@
             document.getElementById('date-input3').value = arr;
         }
     });
-    new SpaceSelector({
+    new SpacePicker({
         inputId: 'space-input',
+        style: {
+            bottom: '120px',
+            width: '90%',
+            btnLocation: 'bottom'
+        },
         data: city, // 符合格式的 json 数据
         success: function(arr) {
             console.log(arr);
