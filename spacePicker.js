@@ -203,12 +203,23 @@
                 if (that.style) {
                     var obj = that.style
                     var container = $id(that.container);
-                    if (obj.width) {
+                    if (obj.width && obj.width !== '100%') {
                         container.style.width = obj.width;
-                        container.style.marginLeft = ((100 - parseFloat(obj.width.replace("%", ""))) / 2).toFixed(2) + '%';
                     }
-                    if (obj.bottom) {
-                        container.style.bottom = obj.bottom;
+                    if (!obj.location) {
+                        if (obj.bottom) {
+                            container.style.bottom = obj.bottom;
+                        }
+                        if (obj.top) {
+                            container.style.top = obj.top;
+                        }
+                    } else {
+                        if(obj.location === 'bottom'){container.style.bottom = 0;}
+                        if(obj.location === 'top'){container.style.top = 0;}
+                        if(obj.location === 'center'){
+                            container.style.top = '50%';
+                            container.style.transform = "translate(-50%,-50%)";
+                        }
                     }
                     if (obj.radius) {
                         container.style.borderRadius = obj.radius;
