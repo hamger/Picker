@@ -76,6 +76,8 @@
     <script>
     new DatePicker({
         inputId: 'date-input', // 目标DOM元素ID
+        start: [2011,3,3], // 开始时间
+        end: [2020,2,2], // 结束时间
         style: {
             top: '120px',
             width: '95%',
@@ -90,8 +92,6 @@
     new DatePicker({
         inputId: 'date-input2',
         type: 'time', // 选择器类型
-        begin_year: 2000, // 开始年份
-        end_year: 2020, // 结束年份
         style: {
             location: 'center',
             radius: '4px'
