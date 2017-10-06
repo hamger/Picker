@@ -7,19 +7,19 @@
         (global.SpacePicker = factory());
 }(this, (function() {
     /**
-     * Function : 以 id 获取 DOM
+     * 以 id 获取 DOM
      */
     function $id(id) {
         return document.getElementById(id);
     }
     /**
-     * Function : DOM 移除自身
+     * DOM 移除自身
      */
     function $removeSelf(dom) {
         dom.parentNode.removeChild(dom);
     }
     /**
-     * Function : 创建选择器构造函数
+     * 创建选择器构造函数
      */
     function SpacePicker(config) {
         this.inputId = config.inputId; // 目标DOM元素ID，必填
@@ -32,12 +32,12 @@
     }
 
     /**
-     * Function : 定义构造函数的原型
+     * 定义构造函数的原型
      */
     SpacePicker.prototype = {
         constructor: SpacePicker,
         /**
-         * Function : 定义初始化标签函数
+         * 定义初始化标签函数
          */
         initTab: function() {
             this.input = $id(this.inputId); // 目标元素
@@ -62,7 +62,7 @@
             this.content = this.wrapId + '-content'; // 选择器内容容器ID
         },
         /**
-         * Function : 定义初始化 UI 函数
+         * 定义初始化 UI 函数
          */
         initUI: function() {
             // 创建选择器的外包裹元素
@@ -79,7 +79,7 @@
             this.renderContent();
         },
         /**
-         * Function : 定义初始化事件函数
+         * 定义初始化事件函数
          */
         initEvent: function() {
             var that = this;
@@ -111,7 +111,7 @@
         },
 
         /**
-         * Function : 创建选择器外包裹元素
+         * 创建选择器外包裹元素
          */
         createContainer: function() {
             var div = document.createElement("div");
@@ -121,8 +121,8 @@
             this.wrap.classList.add('hg-picker-bg');
         },
         /**
-        * Function : 获取当前列后的关联数组
-        * Explain  : @obj 当前选中数据的子数据
+        * 获取当前列后的关联数组
+        * Explain : @obj 当前选中数据的子数据
             @i 当前操作列索引
         */
         getRelatedArr: function(obj, i) {
@@ -133,8 +133,8 @@
             }
         },
         /**
-        * Function : 更新 ulCount 和子数据的参数
-        * Explain  : @i 当前操作列索引
+        * 更新 ulCount 和子数据的参数
+        * Explain : @i 当前操作列索引
             当前操作列的关联数组不需要更新，只需更新其子数据中的关联数组
             ulCount, liNum， spaceIndex, curDis
         */
@@ -147,9 +147,9 @@
             };
         },
         /**
-         * Function : 获取每列关联数据的 value 值
-         * Return   : Array
-         * Explain  : @arr 需要被取值的对象数组
+         * 获取每列关联数据的 value 值
+         * Return : Array
+         * Explain : @arr 需要被取值的对象数组
          */
         getValue: function(arr) {
             var tempArr = [];
@@ -159,7 +159,7 @@
             return tempArr;
         },
         /**
-         * Function : 渲染时间选择器的内容
+         * 渲染时间选择器的内容
          */
         renderContent: function() {
             if (this.style && this.style.btnLocation === 'bottom') {
@@ -198,7 +198,7 @@
             this.setUlWidth();
         },
         /**
-         * Function : 设置选择器样式
+         * 设置选择器样式
          */
         setStyle: function() {
             if (this.style) {
@@ -228,7 +228,7 @@
             }
         },
         /**
-         * Function : 渲染 ul 元素
+         * 渲染 ul 元素
          */
         renderUl: function(i) {
             var parentNode = $id(this.content);
@@ -239,7 +239,7 @@
             this.renderLi(i);
         },
         /**
-         * Function : 渲染 li 元素
+         * 渲染 li 元素
          */
         renderLi: function(i) {
             this.spaceUl[i].innerHTML = ''
@@ -251,7 +251,7 @@
             this.spaceUl[i].innerHTML = lis
         },
         /**
-         * Function : 设置 ul 元素宽度
+         * 设置 ul 元素宽度
          */
         setUlWidth: function() {
             for (var i = 0; i < this.ulCount; i++) {
@@ -259,7 +259,7 @@
             }
         },
         /**
-         * Function : 绑定滑动事件
+         * 绑定滑动事件
          */
         bindRoll: function(i) {
             var that = this
@@ -274,7 +274,7 @@
             }, true);
         },
         /**
-         * Function : 滚动改变位置
+         * 滚动改变位置
          */
         roll: function(i, time) {
             if (this.curDis[i] >= 0) {
@@ -290,7 +290,7 @@
             }
         },
         /**
-         * Function : 时间选择器触摸事件
+         * 时间选择器触摸事件
          */
         touch: function(i) {
             var event = event || window.event;
@@ -323,7 +323,7 @@
             }
         },
         /**
-         * Function : 固定 ul 最终的位置、更新视图
+         * 固定 ul 最终的位置、更新视图
          */
         fixate: function(i) {
             this.renderCount = 0;
@@ -336,7 +336,7 @@
             };
         },
         /**
-         * Function : 获取定位数据
+         * 获取定位数据
          */
         getPosition: function(i) {
             var index = 0;
@@ -355,7 +355,7 @@
             this.curDis[i] = this.spaceIndex[i] * this.liHeight
         },
         /**
-         * Function : 更新内容区视图
+         * 更新内容区视图
          */
         updateView: function(i) {
             var curUlCount = $id(this.content).children.length - 3
@@ -383,7 +383,7 @@
             }
         },
         /**
-         * Function : 获取结果的数组
+         * 获取结果的数组
          */
         getResult: function() {
             var arr = []
@@ -393,14 +393,14 @@
             return arr
         },
         /**
-         * Function : 显示选择器
+         * 显示选择器
          */
         show: function(wrap, container) {
             wrap.classList.add('hg-picker-bg-show');
             container.style.display = 'block';
         },
         /**
-         * Function : 隐藏选择器
+         * 隐藏选择器
          */
         hide: function(wrap, container) {
             wrap.classList.remove('hg-picker-bg-show');
