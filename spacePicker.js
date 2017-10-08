@@ -35,6 +35,7 @@
      * 定义构造函数的原型
      */
     SpacePicker.prototype = {
+        // 明确构造器指向
         constructor: SpacePicker,
         /**
          * 定义初始化标签函数
