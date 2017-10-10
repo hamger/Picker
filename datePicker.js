@@ -23,6 +23,9 @@
         }
         return arr
     }
+
+    // var this.end = [],this.start = [];
+
     /**
      * 创建构造函数
      */
@@ -31,8 +34,16 @@
         this.type = config.type || 'date'; // 选择器类型，选填
         this.start = config.start; // 一个数组表示开始时间，如[2017,8,31]，选填
         this.end = config.end; // 一个数组表示结束时间，如[2019,11,11]，选填
-        this.start = config.start; // 起始时间，选填
-        this.end = config.end; // 结束时间，选填
+        this.start = config.start;
+        this.end = config.end;
+        // 初始显示的时间
+        this.curTime = config.curTime || [
+            new Date().getFullYear(),
+            new Date().getMonth() + 1,
+            new Date().getDate(),
+            new Date().getHours(),
+            new Date().getMinutes()
+        ];
         this.style = config.style; // 选择器样式, 选填
         this.hasSuffix = config.hasSuffix || 'yes'; // 是否添加时间单位，选填
         this.hasZero = config.hasZero || 'yes'; // 一位数是否显示两位，选填
@@ -42,6 +53,7 @@
         this.initUI(); // 初始化UI
         this.initEvent(); // 初始化事件
     }
+
 
     /**
      * 定义构造函数的原型
@@ -53,23 +65,15 @@
          * 定义初始化标签函数
          */
         initTab: function() {
-            // 当前的时间
-            this.curTime = [
-                new Date().getFullYear(),
-                new Date().getMonth() + 1,
-                new Date().getDate(),
-                new Date().getHours(),
-                new Date().getMinutes()
-            ];
             this.previousTime = []; // 储存前一次操作的时间
-            this.resultArr = []; // 储存输出的时间
             this.yearArr = []; // 储存年份的数组
             this.monthArr = []; // 储存月份的数组
             this.dayArr = []; // 储存日期的数组
             this.dayNumArr = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]; // 储存每月天数的数组
             this.hourArr = []; // 储存小时的数组
             this.minuteArr = []; // 储存分钟的数组
-            this.dateTime = []; // 储存各项时间的数组
+            this.dateArr = []; // 储存各项时间的数组
+            this.dateIndex = []; // 储存当前各项时间索引的数组
             this.suffix = this.hasSuffix === 'yes' ? ['年', '月', '日', '时', '分'] : ['', '', '', '', '']; // 储存各项时间后缀的数组
             this.input = $id(this.inputId); // 目标元素
             this.wrapId = this.inputId + '-wrap'; // 选择器外包裹元素ID
@@ -93,7 +97,8 @@
          */
         initUI: function() {
             this.initTimeScope();
-            this.initCurTime();
+            // this.initCurTime();
+            this.previousTime = this.curTime;
             switch (this.type) {
                 case 'date':
                     for (var i = 0; i < 3; i++) {
@@ -152,7 +157,14 @@
 
             // 点击保存按钮隐藏选择器并输出结果
             $id(that.sure).addEventListener('touchstart', function() {
-                that.success(that.result(that.resultArr));
+                var resuArr = [
+                    that.curDate(0),
+                    that.curDate(1),
+                    that.curDate(2),
+                    that.curDate(3),
+                    that.curDate(4)
+                ]
+                that.success(that.result(resuArr));
                 that.hide(wrap, container)
             })
 
@@ -260,15 +272,16 @@
          * 初始化最初显示的时间，并记录
          */
         initCurTime: function() {
-            var now = new Date().getTime()
+            var now = new Date()
+            var nowDate = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
             switch (this.type) {
                 case 'date':
-                    var start = new Date(this.start[0] + '/' + this.start[1] + '/' + this.start[2]).getTime()
-                    var end = new Date(this.end[0] + '/' + this.end[1] + '/' + this.end[2]).getTime()
-                    if (now < start) {
+                    var startDate = new Date(this.start[0] + '/' + this.start[1] + '/' + this.start[2]).getTime()
+                    var endDate = new Date(this.end[0] + '/' + this.end[1] + '/' + this.end[2]).getTime()
+                    if (nowDate < startDate) {
                         this.curTime = this.start
                     }
-                    if (now > end) {
+                    if (nowDate > endDate) {
                         this.curTime = this.end
                     }
                     break;
@@ -300,8 +313,6 @@
                     }
                     break;
             }
-            this.resultArr = this.curTime;
-            this.previousTime = this.curTime;
         },
         /**
          * 计算并返回当前项显示的数组
@@ -313,13 +324,13 @@
                     break;
                 case 1:
                     this.monthArr = []
-                    if (this.resultArr[i - 1] === this.start[0]) {
+                    if (this.curDate(i - 1) === this.start[0]) {
                         if (this.start[0] === this.end[0]) {
                             this.monthArr = getArr(this.start[1], this.end[1])
                         } else {
                             this.monthArr = getArr(this.start[1], 12)
                         }
-                    } else if (this.resultArr[i - 1] === this.end[0]) {
+                    } else if (this.curDate(i - 1) === this.end[0]) {
                         if (this.start[0] === this.end[0]) {
                             this.monthArr = getArr(this.start[1], this.end[1])
                         } else {
@@ -332,25 +343,25 @@
                 case 2:
                     this.dayArr = []
                     // 如果是闰年，2月改为29天
-                    if (this.isLeapYear(this.resultArr[i - 2])) {
+                    if (this.isLeapYear(this.curDate(i - 2))) {
                         this.dayNumArr[1] = 29
                     } else {
                         this.dayNumArr[1] = 28
                     }
-                    if (this.resultArr[i - 2] === this.start[0] && this.resultArr[i - 1] === this.start[1]) {
+                    if (this.curDate(i - 2) === this.start[0] && this.curDate(i - 1) === this.start[1]) {
                         if (this.start[0] === this.end[0] && this.start[1] === this.end[1]) {
                             this.dayArr = getArr(this.start[2], this.end[2])
                         } else {
-                            this.dayArr = getArr(this.start[2], this.dayNumArr[this.resultArr[i - 1] - 1])
+                            this.dayArr = getArr(this.start[2], this.dayNumArr[this.curDate(i - 1) - 1])
                         }
-                    } else if (this.resultArr[i - 2] === this.end[0] && this.resultArr[i - 1] === this.end[1]) {
+                    } else if (this.curDate(i - 2) === this.end[0] && this.curDate(i - 1) === this.end[1]) {
                         if (this.start[0] === this.end[0] && this.start[1] === this.end[1]) {
                             this.dayArr = getArr(this.start[2], this.end[2])
                         } else {
                             this.dayArr = getArr(1, this.end[2])
                         }
                     } else {
-                        this.dayArr = getArr(1, this.dayNumArr[this.resultArr[i - 1] - 1])
+                        this.dayArr = getArr(1, this.dayNumArr[this.curDate(i - 1) - 1])
                     }
                     break;
                 case 3:
@@ -361,41 +372,60 @@
                     break;
             }
         },
+        getCurArr: function(i) {
+            var curArr = []
+            switch (i) {
+                case 0:
+                    curArr = this.yearArr;
+                    break;
+                case 1:
+                    curArr = this.monthArr;
+                    break;
+                case 2:
+                    curArr = this.dayArr;
+                    break;
+                case 3:
+                    curArr = this.hourArr;
+                    break;
+                case 4:
+                    curArr = this.minuteArr;
+                    break;
+            }
+            return curArr
+        },
+        curDate: function(i) {
+            var curDate
+            // this.dateArr 还没有被赋值的情况
+            if (this.dateArr.length === 0) {
+                curDate = this.curTime[i]
+            } else {
+                if (this.dateArr[i] === undefined) {
+                    curDate = undefined
+                } else {
+                    curDate = this.dateArr[i][this.dateIndex[i]]
+                }
+            }
+            return curDate
+        },
         /**
          * 计算并返回当前项所在的位置
          */
         calculateDis: function(i) {
-            var curArr = [];
-            switch (i) {
-                case 0: // 计算月份的定位
-                    curArr = this.yearArr;
-                    break;
-                case 1: // 计算月份的定位
-                    curArr = this.monthArr;
-                    break;
-                case 2: // 计算日期的定位
-                    curArr = this.dayArr;
-                    break;
-                case 3: // 计算小时的定位
-                    curArr = this.hourArr;
-                    break;
-                case 4: // 计算日期的定位
-                    curArr = this.minuteArr;
-                    break;
-            }
+            var curArr = this.getCurArr(i);
             if (this.previousTime[i] > curArr[curArr.length - 1]) {
-                this.curDis[i] = this.liHeight * (curArr.length - 1)
+                this.dateIndex[i] = curArr.length - 1;
             } else if (this.previousTime[i] < curArr[0]) {
-                this.curDis[i] = 0
+                this.dateIndex[i] = 0;
             } else {
                 var that = this;
                 curArr.some(function(val, index) {
                     if (val === that.previousTime[i]) {
-                        that.curDis[i] = that.liHeight * index
+                        that.dateIndex[i] = index;
                         return
                     }
                 })
             }
+            this.curDis[i] = this.liHeight * this.dateIndex[i]
         },
         /**
          * 根据选择器类型确定 dateTime 
@@ -403,13 +433,13 @@
         initDateTime: function() {
             switch (this.type) {
                 case 'date':
-                    this.dateTime = [this.yearArr, this.monthArr, this.dayArr, undefined, undefined];
+                    this.dateArr = [this.yearArr, this.monthArr, this.dayArr, undefined, undefined];
                     break;
                 case 'time':
-                    this.dateTime = [undefined, undefined, undefined, this.hourArr, this.minuteArr];
+                    this.dateArr = [undefined, undefined, undefined, this.hourArr, this.minuteArr];
                     break;
                 case 'dateTime':
-                    this.dateTime = [this.yearArr, this.monthArr, this.dayArr, this.hourArr, this.minuteArr];
+                    this.dateArr = [this.yearArr, this.monthArr, this.dayArr, this.hourArr, this.minuteArr];
                     break;
                 default:
                     throw Error('Please set a right type of hg-picker.');
@@ -419,8 +449,8 @@
          * 判断需要的渲染的 ul 元素个数
          */
         initUlCount: function() {
-            for (var i = 0; i < this.dateTime.length; i++) {
-                if (this.dateTime[i] !== undefined) {
+            for (var i = 0; i < this.dateArr.length; i++) {
+                if (this.dateArr[i] !== undefined) {
                     this.ulCount++
                 }
             }
@@ -430,13 +460,13 @@
          */
         initLiNum: function(index) {
             if (index) {
-                if (this.dateTime[index] !== undefined) {
-                    this.liNum[index] = this.dateTime[index].length
+                if (this.dateArr[index] !== undefined) {
+                    this.liNum[index] = this.dateArr[index].length
                 }
             } else {
-                for (var i = 0; i < this.dateTime.length; i++) {
-                    if (this.dateTime[i] !== undefined) {
-                        this.liNum[i] = this.dateTime[i].length
+                for (var i = 0; i < this.dateArr.length; i++) {
+                    if (this.dateArr[i] !== undefined) {
+                        this.liNum[i] = this.dateArr[i].length
                     }
                 }
             }
@@ -457,12 +487,12 @@
          * 渲染选择器
          */
         renderpicker: function() {
-            var len = this.dateTime.length;
+            var len = this.dateArr.length;
             if (this.style && this.style.btnLocation === 'bottom') {
                 var html = '<div  class="hg-picker-container" id="' + this.container + '">' +
                     '<div class="hg-picker-content">';
                 for (var i = 0; i < len; i++) {
-                    if (this.dateTime[i] !== undefined) {
+                    if (this.dateArr[i] !== undefined) {
                         html += this.renderUl(i)
                     }
                 }
@@ -483,7 +513,7 @@
                     '</div>' +
                     '<div class="hg-picker-content">';
                 for (var i = 0; i < len; i++) {
-                    if (this.dateTime[i] !== undefined) {
+                    if (this.dateArr[i] !== undefined) {
                         html += this.renderUl(i)
                     }
                 }
@@ -496,7 +526,7 @@
 
             this.wrap.innerHTML = html;
             for (var i = 0; i < len; i++) {
-                if (this.dateTime[i] !== undefined) {
+                if (this.dateArr[i] !== undefined) {
                     this.dateUl[i] = $id(this.wrapId + '-ul-' + i);
                     this.dateUl[i].style.width = (100 / this.ulCount).toFixed(2) + '%';
                     this.renderLi(i);
@@ -549,7 +579,7 @@
             var that = this;
             that.dateUl[i].innerHTML = '';
             var lis = '<li></li><li></li>';
-            that.dateTime[i].forEach(function(val, index) {
+            that.dateArr[i].forEach(function(val, index) {
                 val = that.addZero(val);
                 lis += '<li>' + val + that.suffix[i] + '</li>';
             });
@@ -580,9 +610,12 @@
             event.preventDefault();
             switch (event.type) {
                 case "touchstart":
+                    // console.log(this.start + '\n' + this.end + '\n' + this.dateArr + '\n' + this.dateIndex + '\n' + this.previousTime)
                     this.startY = event.touches[0].clientY;
                     this.startTime = new Date();
                     this.curPos[i] = this.curDis[i];
+                    this.previousTime[i] = this.curDate(i);
+                    // console.log(this.start + '\n' + this.end + '\n' + this.dateArr + '\n' + this.dateIndex + '\n' + this.previousTime)
                     break;
                 case "touchend":
                     this.endTime = new Date();
@@ -590,7 +623,18 @@
                         this.curDis[i] = this.curPos[i] + this.liHeight;
                     }
                     this.fixate(i);
+                    switch (i) {
+                        case 0:
+                            this.changeDate(i + 1);
+                            this.changeDate(i + 2);
+                            break;
+                        case 1:
+                            this.changeDate(i + 1);
+                            break;
+                    }
                     this.roll(i, 0.2);
+                    console.log(this.end)
+                    // console.log(this.start + '\n' + this.end + '\n' + this.dateArr + '\n' + this.dateIndex + '\n' + this.previousTime)
                     break;
                 case "touchmove":
                     event.preventDefault();
@@ -610,42 +654,15 @@
          * 确定 ul 最终的位置并储存结果
          */
         fixate: function(i) {
-            var index = 0;
             var liRow = Math.round((this.curDis[i] / this.liHeight).toFixed(2))
             if (liRow > this.liNum[i] - 1) {
-                this.curDis[i] = this.liHeight * (this.liNum[i] - 1)
-                index = this.liNum[i] - 1
+                this.dateIndex[i] = this.liNum[i] - 1
             } else if (liRow < 0) {
-                this.curDis[i] = 0
-                index = 0
+                this.dateIndex[i] = 0
             } else {
-                this.curDis[i] = this.liHeight * liRow
-                index = liRow
+                this.dateIndex[i] = liRow
             }
-            switch (i) {
-                case 0:
-                    this.resultArr[i] = this.dateTime[i][index];
-                    this.previousTime[i] = this.resultArr[i]
-                    this.changeDate(i + 1);
-                    break;
-                case 1:
-                    this.resultArr[i] = this.dateTime[i][index];
-                    this.previousTime[i] = this.resultArr[i]
-                    this.changeDate(i + 1);
-                    break;
-                case 2:
-                    this.resultArr[i] = this.dateTime[i][index];
-                    this.previousTime[i] = this.resultArr[i];
-                    break;
-                case 3:
-                    this.resultArr[i] = this.dateTime[i][index];
-                    this.previousTime[i] = this.resultArr[i]
-                    break;
-                case 4:
-                    this.resultArr[i] = this.dateTime[i][index];
-                    this.previousTime[i] = this.resultArr[i]
-                    break;
-            }
+            this.curDis[i] = this.liHeight * this.dateIndex[i]
         },
         /**
          * 边界判断
@@ -655,19 +672,9 @@
         changeDate: function(i) {
             this.calculateArr(i);
             this.calculateDis(i);
-            var curArr = [];
-            switch (i) {
-                case 1:
-                    curArr = this.monthArr;
-                    break;
-                case 2:
-                    curArr = this.dayArr;
-                    break;
-            }
-            this.dateTime[i] = curArr;
+            this.dateArr[i] = this.getCurArr(i);
             this.initLiNum(i);
             this.renderLi(i);
-            this.fixate(i);
             this.roll(i);
         },
         /**
@@ -690,8 +697,8 @@
          */
         result: function(arr) {
             var arr2 = []
-            for (var i = 0; i < this.dateTime.length; i++) {
-                if (this.dateTime[i] !== undefined) {
+            for (var i = 0; i < this.dateArr.length; i++) {
+                if (this.dateArr[i] !== undefined) {
                     arr2.push(arr[i])
                 }
             }

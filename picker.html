@@ -74,10 +74,20 @@
     <script src="./spacePicker.js"></script>
     <script src="./city.js"></script>
     <script>
+    var now = new Date()
+    var a1 = now.getFullYear()
+    var a2 = now.getMonth() + 1
+    var a3 = now.getDate()
+
+    var pass = new Date( now.getTime() - 86400 * 1000 * 90 )
+    var a4 = pass.getFullYear() 
+    var a5 = pass.getMonth() + 1
+    var a6 = pass.getDate()
+
     new DatePicker({
         inputId: 'date-input', // 目标DOM元素ID
-        start: [2015,10,22], // 开始时间
-        end: [2018,3,3], // 结束时间
+        start: [a4,a5,a6], // 开始时间
+        end: [a1,a2,a3], // 结束时间
         style: {
             top: '120px',
             width: '95%',
@@ -89,36 +99,36 @@
             document.getElementById('date-input').value = arr;
         }
     });
-    new DatePicker({
-        inputId: 'date-input2',
-        type: 'time', // 选择器类型
-        style: {
-            location: 'center',
-            radius: '4px'
-        },
-        success: function(arr) {
-            console.log(arr);
-            document.getElementById('date-input2').value = arr;
-        }
-    });
-    new DatePicker({
-        inputId: 'date-input3',
-        type: 'dateTime',
-        hasSuffix: 'no', // 不添加时间单位
-        hasZero: 'no', // 单位数不显两位
-        success: function(arr) {
-            console.log(arr);
-            document.getElementById('date-input3').value = arr;
-        }
-    });
-    new SpacePicker({
-        inputId: 'space-input',
-        data: city, // 符合格式的 json 数据
-        success: function(arr) {
-            console.log(arr);
-            document.getElementById('space-input').value = arr;
-        }
-    });
+    // new DatePicker({
+    //     inputId: 'date-input2',
+    //     type: 'time', // 选择器类型
+    //     style: {
+    //         location: 'center',
+    //         radius: '4px'
+    //     },
+    //     success: function(arr) {
+    //         console.log(arr);
+    //         document.getElementById('date-input2').value = arr;
+    //     }
+    // });
+    // new DatePicker({
+    //     inputId: 'date-input3',
+    //     type: 'dateTime',
+    //     hasSuffix: 'no', // 不添加时间单位
+    //     hasZero: 'no', // 单位数不显两位
+    //     success: function(arr) {
+    //         console.log(arr);
+    //         document.getElementById('date-input3').value = arr;
+    //     }
+    // });
+    // new SpacePicker({
+    //     inputId: 'space-input',
+    //     data: city, // 符合格式的 json 数据
+    //     success: function(arr) {
+    //         console.log(arr);
+    //         document.getElementById('space-input').value = arr;
+    //     }
+    // });
     </script>
 </body>
 
