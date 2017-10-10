@@ -99,36 +99,36 @@
             document.getElementById('date-input').value = arr;
         }
     });
-    // new DatePicker({
-    //     inputId: 'date-input2',
-    //     type: 'time', // 选择器类型
-    //     style: {
-    //         location: 'center',
-    //         radius: '4px'
-    //     },
-    //     success: function(arr) {
-    //         console.log(arr);
-    //         document.getElementById('date-input2').value = arr;
-    //     }
-    // });
-    // new DatePicker({
-    //     inputId: 'date-input3',
-    //     type: 'dateTime',
-    //     hasSuffix: 'no', // 不添加时间单位
-    //     hasZero: 'no', // 单位数不显两位
-    //     success: function(arr) {
-    //         console.log(arr);
-    //         document.getElementById('date-input3').value = arr;
-    //     }
-    // });
-    // new SpacePicker({
-    //     inputId: 'space-input',
-    //     data: city, // 符合格式的 json 数据
-    //     success: function(arr) {
-    //         console.log(arr);
-    //         document.getElementById('space-input').value = arr;
-    //     }
-    // });
+    new DatePicker({
+        inputId: 'date-input2',
+        type: 'time', // 选择器类型
+        style: {
+            location: 'center',
+            radius: '4px'
+        },
+        success: function(arr) {
+            console.log(arr);
+            document.getElementById('date-input2').value = arr;
+        }
+    });
+    new DatePicker({
+        inputId: 'date-input3',
+        type: 'dateTime',
+        hasSuffix: 'no', // 不添加时间单位
+        hasZero: 'no', // 单位数不显两位
+        success: function(arr) {
+            console.log(arr);
+            document.getElementById('date-input3').value = arr;
+        }
+    });
+    new SpacePicker({
+        inputId: 'space-input',
+        data: city, // 符合格式的 json 数据
+        success: function(arr) {
+            console.log(arr);
+            document.getElementById('space-input').value = arr;
+        }
+    });
     </script>
 </body>
 

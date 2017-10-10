@@ -12,6 +12,7 @@
     function $id(id) {
         return document.getElementById(id);
     }
+
     /**
      * 获取从 start 到 end 的数组
      * Return : Array
@@ -24,8 +25,6 @@
         return arr
     }
 
-    // var this.end = [],this.start = [];
-
     /**
      * 创建构造函数
      */
@@ -34,8 +33,6 @@
         this.type = config.type || 'date'; // 选择器类型，选填
         this.start = config.start; // 一个数组表示开始时间，如[2017,8,31]，选填
         this.end = config.end; // 一个数组表示结束时间，如[2019,11,11]，选填
-        this.start = config.start;
-        this.end = config.end;
         // 初始显示的时间
         this.curTime = config.curTime || [
             new Date().getFullYear(),
@@ -53,7 +50,6 @@
         this.initUI(); // 初始化UI
         this.initEvent(); // 初始化事件
     }
-
 
     /**
      * 定义构造函数的原型
@@ -610,12 +606,10 @@
             event.preventDefault();
             switch (event.type) {
                 case "touchstart":
-                    // console.log(this.start + '\n' + this.end + '\n' + this.dateArr + '\n' + this.dateIndex + '\n' + this.previousTime)
                     this.startY = event.touches[0].clientY;
                     this.startTime = new Date();
                     this.curPos[i] = this.curDis[i];
                     this.previousTime[i] = this.curDate(i);
-                    // console.log(this.start + '\n' + this.end + '\n' + this.dateArr + '\n' + this.dateIndex + '\n' + this.previousTime)
                     break;
                 case "touchend":
                     this.endTime = new Date();
@@ -634,7 +628,6 @@
                     }
                     this.roll(i, 0.2);
                     console.log(this.end)
-                    // console.log(this.start + '\n' + this.end + '\n' + this.dateArr + '\n' + this.dateIndex + '\n' + this.previousTime)
                     break;
                 case "touchmove":
                     event.preventDefault();
