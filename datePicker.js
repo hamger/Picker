@@ -34,7 +34,7 @@
         this.start = config.start; // 一个数组表示开始时间，如[2017,8,31]，选填
         this.end = config.end; // 一个数组表示结束时间，如[2019,11,11]，选填
         // 初始显示的时间
-        this.curTime = config.curTime || [
+        this.initTime = config.initTime || [
             new Date().getFullYear(),
             new Date().getMonth() + 1,
             new Date().getDate(),
@@ -94,7 +94,7 @@
         initUI: function() {
             this.initTimeScope();
             // this.initCurTime();
-            this.previousTime = this.curTime;
+            this.previousTime = this.initTime;
             switch (this.type) {
                 case 'date':
                     for (var i = 0; i < 3; i++) {
@@ -275,25 +275,25 @@
                     var startDate = new Date(this.start[0] + '/' + this.start[1] + '/' + this.start[2]).getTime()
                     var endDate = new Date(this.end[0] + '/' + this.end[1] + '/' + this.end[2]).getTime()
                     if (nowDate < startDate) {
-                        this.curTime = this.start
+                        this.initTime = this.start
                     }
                     if (nowDate > endDate) {
-                        this.curTime = this.end
+                        this.initTime = this.end
                     }
                     break;
                 case 'time':
-                    if (this.curTime[3] <= this.start[3]) {
-                        this.curTime[3] = this.start[3]
-                        if (this.curTime[4] <= this.start[4]) {
-                            this.curTime[4] = this.start[4]
+                    if (this.initTime[3] <= this.start[3]) {
+                        this.initTime[3] = this.start[3]
+                        if (this.initTime[4] <= this.start[4]) {
+                            this.initTime[4] = this.start[4]
                         }
-                    } else if (this.curTime[3] >= this.end[3]) {
-                        this.curTime[3] = this.end[3]
-                        if (this.curTime[4] >= this.end[4]) {
-                            this.curTime[4] = this.end[4]
+                    } else if (this.initTime[3] >= this.end[3]) {
+                        this.initTime[3] = this.end[3]
+                        if (this.initTime[4] >= this.end[4]) {
+                            this.initTime[4] = this.end[4]
                         }
                     } else {
-                        this.curTime = this.curTime
+                        this.initTime = this.initTime
                     }
                     break;
                 case 'dateTime':
@@ -302,10 +302,10 @@
                     var end = new Date(this.end[0] + '/' + this.end[1] + '/' + this.end[2] +
                         ' ' + this.end[3] + ':' + this.end[4]).getTime()
                     if (now < start) {
-                        this.curTime = this.start
+                        this.initTime = this.start
                     }
                     if (now > end) {
-                        this.curTime = this.end
+                        this.initTime = this.end
                     }
                     break;
             }
@@ -393,7 +393,7 @@
             var curDate
             // this.dateArr 还没有被赋值的情况
             if (this.dateArr.length === 0) {
-                curDate = this.curTime[i]
+                curDate = this.initTime[i]
             } else {
                 if (this.dateArr[i] === undefined) {
                     curDate = undefined
