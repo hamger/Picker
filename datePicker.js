@@ -1,4 +1,4 @@
-/**
+ /**
  * Created by Hanger on 2017/7/18.
  */
 (function(global, factory) {
@@ -34,16 +34,26 @@
         this.start = config.start; // 一个数组表示开始时间，如[2017,8,31]，选填
         this.end = config.end; // 一个数组表示结束时间，如[2019,11,11]，选填
         // 初始显示的时间
-        if (config.curTime) {
-            this.curTime = [
-                config.curTime[0] || new Date().getFullYear(),
-                config.curTime[1] || new Date().getMonth() + 1,
-                config.curTime[2] || new Date().getDate(),
-                config.curTime[3] || new Date().getHours(),
-                config.curTime[4] || new Date().getMinutes()
-            ]
+        if (config.firstTime) {
+            if(this.type === 'time') {   
+                this.firstTime = [
+                    undefined,
+                    undefined,
+                    undefined,
+                    config.firstTime[0] || new Date().getHours(),
+                    config.firstTime[1] || new Date().getMinutes()
+                ]
+            } else {
+                this.firstTime = [
+                    config.firstTime[0] || new Date().getFullYear(),
+                    config.firstTime[1] || new Date().getMonth() + 1,
+                    config.firstTime[2] || new Date().getDate(),
+                    config.firstTime[3] || new Date().getHours(),
+                    config.firstTime[4] || new Date().getMinutes()
+                ]
+            }
         } else {
-            this.curTime = [
+            this.firstTime = [
                 new Date().getFullYear(),
                 new Date().getMonth() + 1,
                 new Date().getDate(),
@@ -103,8 +113,8 @@
          */
         initUI: function() {
             this.initTimeScope();
-            this.initCurTime();
-            this.previousTime = this.curTime;
+            this.initFirstTime();
+            this.previousTime = this.firstTime;
             switch (this.type) {
                 case 'date':
                     for (var i = 0; i < 3; i++) {
@@ -265,51 +275,51 @@
         /**
          * 初始化最初显示的时间，并记录
          */
-        initCurTime: function() {
+        initFirstTime: function() {
             switch (this.type) {
                 case 'date':
-                    var curTime = new Date(this.curTime[0],
-                        this.curTime[1] - 1,
-                        this.curTime[2]).getTime()
+                    var firstTime = new Date(this.firstTime[0],
+                        this.firstTime[1] - 1,
+                        this.firstTime[2]).getTime()
                     var startDate = new Date(this.start[0] + '/' + this.start[1] + '/' + this.start[2]).getTime()
                     var endDate = new Date(this.end[0] + '/' + this.end[1] + '/' + this.end[2]).getTime()
-                    if (curTime < startDate) {
-                        this.curTime = this.start
+                    if (firstTime < startDate) {
+                        this.firstTime = this.start
                     }
-                    if (curTime > endDate) {
-                        this.curTime = this.end
+                    if (firstTime > endDate) {
+                        this.firstTime = this.end
                     }
                     break;
                 case 'time':
-                    if (this.curTime[3] <= this.start[3]) {
-                        this.curTime[3] = this.start[3]
-                        if (this.curTime[4] <= this.start[4]) {
-                            this.curTime[4] = this.start[4]
+                    if (this.firstTime[3] <= this.start[3]) {
+                        this.firstTime[3] = this.start[3]
+                        if (this.firstTime[4] <= this.start[4]) {
+                            this.firstTime[4] = this.start[4]
                         }
-                    } else if (this.curTime[3] >= this.end[3]) {
-                        this.curTime[3] = this.end[3]
-                        if (this.curTime[4] >= this.end[4]) {
-                            this.curTime[4] = this.end[4]
+                    } else if (this.firstTime[3] >= this.end[3]) {
+                        this.firstTime[3] = this.end[3]
+                        if (this.firstTime[4] >= this.end[4]) {
+                            this.firstTime[4] = this.end[4]
                         }
                     } else {
-                        this.curTime = this.curTime
+                        this.firstTime = this.firstTime
                     }
                     break;
                 case 'dateTime':
-                    var curTime = new Date(this.curTime[0],
-                        this.curTime[1] - 1,
-                        this.curTime[2],
-                        this.curTime[3],
-                        this.curTime[4]).getTime()
+                    var firstTime = new Date(this.firstTime[0],
+                        this.firstTime[1] - 1,
+                        this.firstTime[2],
+                        this.firstTime[3],
+                        this.firstTime[4]).getTime()
                     var start = new Date(this.start[0] + '/' + this.start[1] + '/' + this.start[2] +
                         ' ' + this.start[3] + ':' + this.start[4]).getTime()
                     var end = new Date(this.end[0] + '/' + this.end[1] + '/' + this.end[2] +
                         ' ' + this.end[3] + ':' + this.end[4]).getTime()
-                    if (curTime < start) {
-                        this.curTime = this.start
+                    if (firstTime < start) {
+                        this.firstTime = this.start
                     }
-                    if (curTime > end) {
-                        this.curTime = this.end
+                    if (firstTime > end) {
+                        this.firstTime = this.end
                     }
                     break;
             }
@@ -441,7 +451,7 @@
             var curDate
             // this.dateArr 还没有被赋值的情况
             if (this.dateArr.length === 0) {
-                curDate = this.curTime[i]
+                curDate = this.firstTime[i]
             } else {
                 if (this.dateArr[i] === undefined) {
                     curDate = undefined
@@ -590,7 +600,7 @@
          * 改变时间的显示位置
          */
         roll: function(i, time) {
-            if(this.curDis[i]){
+            if(this.curDis[i] || this.curDis[i] === 0){
                 if (this.curDis[i] >= 0) {
                     this.dateUl[i].style.transform = 'translate3d(0,-' + this.curDis[i] + 'px, 0)';
                     this.dateUl[i].style.webkitTransform = 'translate3d(0,-' + this.curDis[i] + 'px, 0)';
