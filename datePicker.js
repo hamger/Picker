@@ -1,4 +1,4 @@
- /**
+/**
  * Created by Hanger on 2017/7/18.
  */
 (function(global, factory) {
@@ -31,41 +31,55 @@
     function DatePicker(config) {
         this.inputId = config.inputId; // 目标 input 元素，必填
         this.type = config.type || 'date'; // 选择器类型，选填
-        this.start = config.start; // 一个数组表示开始时间，如[2017,8,31]，选填
-        this.end = config.end; // 一个数组表示结束时间，如[2019,11,11]，选填
-        // 初始显示的时间
-        if (config.firstTime) {
-            if(this.type === 'time') {   
-                this.firstTime = [
-                    undefined,
-                    undefined,
-                    undefined,
-                    config.firstTime[0] || new Date().getHours(),
-                    config.firstTime[1] || new Date().getMinutes()
-                ]
+        // 初始化开始、结束、初始显示时间, 选填
+        if (this.type === 'time') {
+            if (config.start) {
+                if (config.start.length < 2) throw Error('配置项 start 不完整');
+                this.start = [undefined, undefined, undefined, config.start[0], config.start[1]];
             } else {
-                this.firstTime = [
-                    config.firstTime[0] || new Date().getFullYear(),
-                    config.firstTime[1] || new Date().getMonth() + 1,
-                    config.firstTime[2] || new Date().getDate(),
-                    config.firstTime[3] || new Date().getHours(),
-                    config.firstTime[4] || new Date().getMinutes()
-                ]
+                this.start = [undefined, undefined, undefined, 0, 0];
+            }
+            if (config.end) {
+                if (config.end.length < 2) throw Error('配置项 end 不完整');
+                this.end = [undefined, undefined, undefined, config.end[0], config.end[1]];
+            } else {
+                this.end = [undefined, undefined, undefined, 23, 59];
+            }
+            if (config.firstTime) {
+              if (config.firstTime.length < 2) throw Error('配置项 firstTime 不完整');
+                this.firstTime = [undefined, undefined, undefined, config.firstTime[0], config.firstTime[1]];
+            } else {
+                this.firstTime = [undefined, undefined, undefined, new Date().getHours(), new Date().getMinutes()];
             }
         } else {
-            this.firstTime = [
+            this.start = config.start || [
+                new Date().getFullYear() - 4,
+                new Date().getMonth() + 1,
+                new Date().getDate(),
+                new Date().getHours(),
+                new Date().getMinutes()
+            ];
+            this.end = config.end || [
+                new Date().getFullYear() + 4,
+                new Date().getMonth() + 1,
+                new Date().getDate(),
+                new Date().getHours(),
+                new Date().getMinutes()
+            ];
+            this.firstTime = config.firstTime || [
                 new Date().getFullYear(),
                 new Date().getMonth() + 1,
                 new Date().getDate(),
                 new Date().getHours(),
                 new Date().getMinutes()
-            ]
+            ];
         }
         this.style = config.style; // 选择器样式, 选填
         this.hasSuffix = config.hasSuffix || 'yes'; // 是否添加时间单位，选填
         this.hasZero = config.hasZero || 'yes'; // 一位数是否显示两位，选填
         this.success = config.success; // 成功的回调函数，必填
         this.error = config.error; // 失败（选择的时间不在规定内）的回调函数，选填
+        this.check();
         this.initTab(); // 初始化标签
         this.initUI(); // 初始化UI
         this.initEvent(); // 初始化事件
@@ -77,6 +91,64 @@
     DatePicker.prototype = {
         // 明确构造器指向
         constructor: DatePicker,
+        // 检查配置项是否合法
+        check: function() {
+            function isNumberArr(arr) {
+                if (arr instanceof Array) {
+                    return arr.every(function(val) {
+                        return (typeof(val) === "number" || typeof(val) === "undefined")
+                    });
+                } else {
+                    return false
+                }
+            }
+            if (!this.inputId) throw Error('配置项 inputId 不能为空.');
+            if (!this.success) throw Error('配置项 success 不能为空.');
+            if (this.hasSuffix !== 'yes' && this.hasSuffix !== 'no') throw Error('配置项 hasSuffix 不合法.');
+            if (this.hasZero !== 'yes' && this.hasZero !== 'no') throw Error('配置项 hasZero 不合法.');
+            if (this.type !== 'time' && this.type !== 'dateTime' && this.type !== 'date') throw Error('配置项 type 不合法.');
+            if (!isNumberArr(this.start)) throw Error('配置项 start 不合法');
+            if (!isNumberArr(this.end)) throw Error('配置项 end 不合法');
+            if (!isNumberArr(this.firstTime)) throw Error('配置项 firstTime 不合法');
+            switch (this.type) {
+                case 'date':
+                    if(this.start.length < 3) throw Error('配置项 start 不完整');
+                    if(this.end.length < 3) throw Error('配置项 end 不完整');
+                    if(this.firstTime.length < 3) throw Error('配置项 firstTime 不完整');
+                    var start = new Date(this.start[0] + '/' + this.start[1] + '/' + this.start[2]).getTime()
+                    var end = new Date(this.end[0] + '/' + this.end[1] + '/' + this.end[2]).getTime()
+                    var first = new Date(this.firstTime[0] + '/' + this.firstTime[1] + '/' + this.firstTime[2]).getTime()
+                    if (start > end) throw Error('开始时间不能大于结束时间.');
+                    if (first > end || first < start) throw Error('初始显示时间需在开始时间和结束时间之间.');
+                    break;
+                case 'time':
+                    function tf(i) {
+                        return (i < 10 ? '0' : '') + i
+                    };
+                    var startStr = this.start[3] + tf(this.start[4]);
+                    var start = parseInt(startStr);
+                    var endStr = this.end[3] + tf(this.end[4]);
+                    var end = parseInt(endStr);
+                    var firstStr = this.firstTime[3] + tf(this.firstTime[4]);
+                    var first = parseInt(firstStr);
+                    if (start > end) throw Error('开始时间不能大于结束时间.');
+                    if (first > end || first < start) throw Error('初始显示时间需在开始时间和结束时间之间.');
+                    break;
+                case 'dateTime':
+                    if(this.start.length < 5) throw Error('配置项 start 不完整');
+                    if(this.end.length < 5) throw Error('配置项 end 不完整');
+                    if(this.firstTime.length < 5) throw Error('配置项 firstTime 不完整');
+                    var start = new Date(this.start[0] + '/' + this.start[1] + '/' + this.start[2] +
+                        ' ' + this.start[3] + ':' + this.start[4]).getTime();
+                    var end = new Date(this.end[0] + '/' + this.end[1] + '/' + this.end[2] +
+                        ' ' + this.end[3] + ':' + this.end[4]).getTime();
+                    var first = new Date(this.firstTime[0] + '/' + this.firstTime[1] + '/' + this.firstTime[2] +
+                        ' ' + this.firstTime[3] + ':' + this.firstTime[4]).getTime();
+                    if (start > end) throw Error('开始时间不能大于结束时间.');
+                    if (first > end || first < start) throw Error('初始显示时间需在开始时间和结束时间之间.');
+                    break;
+            }
+        },
         /**
          * 定义初始化标签函数
          */
@@ -112,8 +184,6 @@
          * 定义初始化 UI 函数
          */
         initUI: function() {
-            this.initTimeScope();
-            this.initFirstTime();
             this.previousTime = this.firstTime;
             switch (this.type) {
                 case 'date':
@@ -137,9 +207,7 @@
             }
             this.initDateArr();
             this.initUlCount();
-            for (var i = 0; i < this.dateArr.length; i++) {
-                this.initLiNum(i);
-            }
+            this.initLiNum();
             this.createContainer();
             this.renderpicker();
             for (var i = 0; i < this.dateArr.length; i++) {
@@ -200,167 +268,6 @@
             });
         },
         /**
-         * 初始化选择时间的范围
-         */
-        initTimeScope: function() {
-            switch (this.type) {
-                case 'date':
-                    if (!this.start) {
-                        this.start = [new Date().getFullYear() - 5, 1, 1, undefined, undefined]
-                    } else if (this.start.length === 1) {
-                        this.start = [this.start[0], 1, 1, undefined, undefined]
-                    } else if (this.start.length === 2) {
-                        this.start = [this.start[0], this.start[1], 1, undefined, undefined]
-                    } else {
-                        this.start = [this.start[0], this.start[1], this.start[2], undefined, undefined]
-                    }
-                    if (!this.end) {
-                        this.end = [new Date().getFullYear() + 5, 12, 31, undefined, undefined]
-                    } else if (this.end.length === 1) {
-                        this.end = [this.end[0], 12, 31, undefined, undefined]
-                    } else if (this.end.length === 2) {
-                        this.end = [this.end[0], this.end[1], 31, undefined, undefined]
-                    } else {
-                        this.end = [this.end[0], this.end[1], this.end[2], undefined, undefined]
-                    }
-                    break;
-                case 'time':
-                    if (!this.start) {
-                        this.start = [undefined, undefined, undefined, 0, 0]
-                    } else if (this.start.length === 1) {
-                        this.start = [undefined, undefined, undefined, this.start[0], 0]
-                    } else {
-                        this.start = [undefined, undefined, undefined, this.start[0], this.start[1]]
-                    }
-                    if (!this.end) {
-                        this.end = [undefined, undefined, undefined, 23, 59]
-                    } else if (this.end.length === 1) {
-                        this.end = [undefined, undefined, undefined, this.end[0], 59]
-                    } else {
-                        this.end = [undefined, undefined, undefined, this.end[0], this.end[1]]
-                    }
-                    break;
-                case 'dateTime':
-                    if (!this.start) {
-                        this.start = [new Date().getFullYear() - 5, 1, 1, 0, 0]
-                    } else if (this.start.length === 1) {
-                        this.start = [this.start[0], 1, 1, 0, 0]
-                    } else if (this.start.length === 2) {
-                        this.start = [this.start[0], this.start[1], 1, 0, 0]
-                    } else if (this.start.length === 3) {
-                        this.start = [this.start[0], this.start[1], this.start[2], 0, 0]
-                    } else if (this.start.length === 4) {
-                        this.start = [this.start[0], this.start[1], this.start[2], this.start[3], 0]
-                    } else {
-                        this.start = [this.start[0], this.start[1], this.start[2], this.start[3], this.start[4]]
-                    }
-                    if (!this.end) {
-                        this.end = [new Date().getFullYear() + 5, 12, 31, 23, 59]
-                    } else if (this.end.length === 1) {
-                        this.end = [this.end[0], 12, 31, 23, 59]
-                    } else if (this.end.length === 2) {
-                        this.end = [this.end[0], this.end[1], 31, 23, 59]
-                    } else if (this.end.length === 3) {
-                        this.end = [this.end[0], this.end[1], this.end[2], 23, 59]
-                    } else if (this.end.length === 4) {
-                        this.end = [this.end[0], this.end[1], this.end[2], this.end[3], 59]
-                    } else {
-                        this.end = [this.end[0], this.end[1], this.end[2], this.end[3], this.end[4]]
-                    }
-                    break;
-                default:
-                    throw Error('Please set a right type of hg-picker.');
-            }
-        },
-        /**
-         * 初始化最初显示的时间，并记录
-         */
-        initFirstTime: function() {
-            switch (this.type) {
-                case 'date':
-                    var firstTime = new Date(this.firstTime[0],
-                        this.firstTime[1] - 1,
-                        this.firstTime[2]).getTime()
-                    var startDate = new Date(this.start[0] + '/' + this.start[1] + '/' + this.start[2]).getTime()
-                    var endDate = new Date(this.end[0] + '/' + this.end[1] + '/' + this.end[2]).getTime()
-                    if (firstTime < startDate) {
-                        this.firstTime = this.start
-                    }
-                    if (firstTime > endDate) {
-                        this.firstTime = this.end
-                    }
-                    break;
-                case 'time':
-                    if (this.firstTime[3] <= this.start[3]) {
-                        this.firstTime[3] = this.start[3]
-                        if (this.firstTime[4] <= this.start[4]) {
-                            this.firstTime[4] = this.start[4]
-                        }
-                    } else if (this.firstTime[3] >= this.end[3]) {
-                        this.firstTime[3] = this.end[3]
-                        if (this.firstTime[4] >= this.end[4]) {
-                            this.firstTime[4] = this.end[4]
-                        }
-                    } else {
-                        this.firstTime = this.firstTime
-                    }
-                    break;
-                case 'dateTime':
-                    var firstTime = new Date(this.firstTime[0],
-                        this.firstTime[1] - 1,
-                        this.firstTime[2],
-                        this.firstTime[3],
-                        this.firstTime[4]).getTime()
-                    var start = new Date(this.start[0] + '/' + this.start[1] + '/' + this.start[2] +
-                        ' ' + this.start[3] + ':' + this.start[4]).getTime()
-                    var end = new Date(this.end[0] + '/' + this.end[1] + '/' + this.end[2] +
-                        ' ' + this.end[3] + ':' + this.end[4]).getTime()
-                    if (firstTime < start) {
-                        this.firstTime = this.start
-                    }
-                    if (firstTime > end) {
-                        this.firstTime = this.end
-                    }
-                    break;
-            }
-        },
-        /**
-         * 根据选择器类型确定 dateArr 
-         */
-        initDateArr: function() {
-            switch (this.type) {
-                case 'date':
-                    this.dateArr = [this.yearArr, this.monthArr, this.dayArr, undefined, undefined];
-                    break;
-                case 'time':
-                    this.dateArr = [undefined, undefined, undefined, this.hourArr, this.minuteArr];
-                    break;
-                case 'dateTime':
-                    this.dateArr = [this.yearArr, this.monthArr, this.dayArr, this.hourArr, this.minuteArr];
-                    break;
-                default:
-                    throw Error('Please set a right type of hg-picker.');
-            }
-        },
-        /**
-         * 判断需要的渲染的 ul 元素个数
-         */
-        initUlCount: function() {
-            for (var i = 0; i < this.dateArr.length; i++) {
-                if (this.dateArr[i] !== undefined) {
-                    this.ulCount++
-                }
-            }
-        },
-        /**
-         * 判断每个 ul 中有多少个 li 选项
-         */
-        initLiNum: function(i) {
-            if (this.dateArr[i] !== undefined) {
-                this.liNum[i] = this.dateArr[i].length
-            }
-        },
-        /**
          * 计算并返回当前项显示的数组
          */
         calculateArr: function(i) {
@@ -388,7 +295,7 @@
                     break;
                 case 2:
                     this.dayArr = []
-                    // 如果是闰年，2月改为29天
+                        // 如果是闰年，2月改为29天
                     if (this.isLeapYear(this.curDate(i - 2))) {
                         this.dayNumArr[1] = 29
                     } else {
@@ -418,10 +325,6 @@
                     break;
             }
         },
-        /**
-         * 返回当前操作列的数组
-         * Return : Array
-         */
         getCurArr: function(i) {
             var curArr = []
             switch (i) {
@@ -443,13 +346,9 @@
             }
             return curArr
         },
-        /**
-         * 返回当前操作列的日期
-         * Return : Number
-         */
         curDate: function(i) {
             var curDate
-            // this.dateArr 还没有被赋值的情况
+                // this.dateArr 还没有被赋值的情况
             if (this.dateArr.length === 0) {
                 curDate = this.firstTime[i]
             } else {
@@ -480,6 +379,50 @@
                 })
             }
             this.curDis[i] = this.liHeight * this.dateIndex[i]
+        },
+        /**
+         * 根据选择器类型确定 dateArr
+         */
+        initDateArr: function() {
+            switch (this.type) {
+                case 'date':
+                    this.dateArr = [this.yearArr, this.monthArr, this.dayArr];
+                    break;
+                case 'time':
+                    this.dateArr = [undefined, undefined, undefined, this.hourArr, this.minuteArr];
+                    break;
+                case 'dateTime':
+                    this.dateArr = [this.yearArr, this.monthArr, this.dayArr, this.hourArr, this.minuteArr];
+                    break;
+                default:
+                    throw Error('Please set a right type of hg-picker.');
+            }
+        },
+        /**
+         * 判断需要的渲染的 ul 元素个数
+         */
+        initUlCount: function() {
+            for (var i = 0; i < this.dateArr.length; i++) {
+                if (this.dateArr[i] !== undefined) {
+                    this.ulCount++
+                }
+            }
+        },
+        /**
+         * 判断每个 ul 中有多少个 li 选项
+         */
+        initLiNum: function(index) {
+            if (index) {
+                if (this.dateArr[index] !== undefined) {
+                    this.liNum[index] = this.dateArr[index].length
+                }
+            } else {
+                for (var i = 0; i < this.dateArr.length; i++) {
+                    if (this.dateArr[i] !== undefined) {
+                        this.liNum[i] = this.dateArr[i].length
+                    }
+                }
+            }
         },
         /**
          * 创建选择器外包裹元素
@@ -600,7 +543,7 @@
          * 改变时间的显示位置
          */
         roll: function(i, time) {
-            if(this.curDis[i] || this.curDis[i] === 0){
+            if (this.curDis[i] || this.curDis[i] === 0) {
                 if (this.curDis[i] >= 0) {
                     this.dateUl[i].style.transform = 'translate3d(0,-' + this.curDis[i] + 'px, 0)';
                     this.dateUl[i].style.webkitTransform = 'translate3d(0,-' + this.curDis[i] + 'px, 0)';
@@ -643,6 +586,7 @@
                             break;
                     }
                     this.roll(i, 0.2);
+                    console.log(this.end)
                     break;
                 case "touchmove":
                     event.preventDefault();
