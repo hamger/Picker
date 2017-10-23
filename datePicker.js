@@ -96,10 +96,10 @@
             function isNumberArr(arr) {
                 if (arr instanceof Array) {
                     return arr.every(function(val) {
-                        return (typeof(val) === "number" || typeof(val) === "undefined")
+                        return (typeof(val) === "number" || typeof(val) === "undefined");
                     });
                 } else {
-                    return false
+                    return false;
                 }
             }
             if (!this.inputId) throw Error('配置项 inputId 不能为空.');
@@ -119,7 +119,8 @@
                     var end = new Date(this.end[0] + '/' + this.end[1] + '/' + this.end[2]).getTime()
                     var first = new Date(this.firstTime[0] + '/' + this.firstTime[1] + '/' + this.firstTime[2]).getTime()
                     if (start > end) throw Error('开始时间不能大于结束时间.');
-                    if (first > end || first < start) throw Error('初始显示时间需在开始时间和结束时间之间.');
+                    if (first > end) { this.firstTime = this.end };
+                    if (first < start) { this.firstTime = this.start };
                     break;
                 case 'time':
                     function tf(i) {
@@ -132,7 +133,8 @@
                     var firstStr = this.firstTime[3] + tf(this.firstTime[4]);
                     var first = parseInt(firstStr);
                     if (start > end) throw Error('开始时间不能大于结束时间.');
-                    if (first > end || first < start) throw Error('初始显示时间需在开始时间和结束时间之间.');
+                    if (first > end) { this.firstTime = this.end };
+                    if (first < start) { this.firstTime = this.start };
                     break;
                 case 'dateTime':
                     if(this.start.length < 5) throw Error('配置项 start 不完整');
@@ -145,7 +147,8 @@
                     var first = new Date(this.firstTime[0] + '/' + this.firstTime[1] + '/' + this.firstTime[2] +
                         ' ' + this.firstTime[3] + ':' + this.firstTime[4]).getTime();
                     if (start > end) throw Error('开始时间不能大于结束时间.');
-                    if (first > end || first < start) throw Error('初始显示时间需在开始时间和结束时间之间.');
+                    if (first > end) { this.firstTime = this.end };
+                    if (first < start) { this.firstTime = this.start };
                     break;
             }
         },
