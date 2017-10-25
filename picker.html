@@ -94,6 +94,7 @@
             btnLocation: 'bottom',
             radius: '10px'
         },
+        title: '选择日期',
         success: function(arr) { // 回调函数
             console.log(arr);
             document.getElementById('date-input').value = arr;
@@ -123,6 +124,7 @@
     });
     new SpacePicker({
         inputId: 'space-input',
+        title: '选择城市',
         data: city, // 符合格式的 json 数据
         success: function(arr) {
             console.log(arr);

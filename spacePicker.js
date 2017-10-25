@@ -25,6 +25,7 @@
         this.inputId = config.inputId; // 目标DOM元素ID，必填
         this.data = config.data; // json 数据，必填
         this.success = config.success; // 回调函数，必填
+        this.title = config.title || ''; // 选择器标题，选填
         this.style = config.style; // 选择器样式, 选填
         this.initTab(); // 初始化标签
         this.initUI(); // 初始化UI
@@ -164,20 +165,22 @@
          */
         renderContent: function() {
             if (this.style && this.style.btnLocation === 'bottom') {
-                var html = '<div  class="hg-picker-container" id="' + this.container + '">' +
+                var html = '<div class="hg-picker-container" id="' + this.container + '">' +
                     '<div class="hg-picker-content" id="' + this.content + '">' +
                     '<div class="hg-picker-up-shadow"></div>' +
                     '<div class="hg-picker-down-shadow"></div>' +
                     '<div class="hg-picker-line"></div>' +
                     '</div>' +
                     '<div class="hg-picker-btn-box">' +
+                    this.title +
                     '<div class="hg-picker-btn" id="' + this.cancel + '">返回</div>' +
                     '<div class="hg-picker-btn" id="' + this.sure + '">确定</div>' +
                     '</div>' +
                     '</div>';
             } else {
-                var html = '<div  class="hg-picker-container" id="' + this.container + '">' +
+                var html = '<div class="hg-picker-container" id="' + this.container + '">' +
                     '<div class="hg-picker-btn-box">' +
+                    this.title +
                     '<div class="hg-picker-btn" id="' + this.cancel + '">返回</div>' +
                     '<div class="hg-picker-btn" id="' + this.sure + '">确定</div>' +
                     '</div>' +

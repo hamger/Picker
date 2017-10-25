@@ -31,6 +31,7 @@
     function DatePicker(config) {
         this.inputId = config.inputId; // 目标 input 元素，必填
         this.type = config.type || 'date'; // 选择器类型，选填
+        this.title = config.title || ''; // 选择器标题，选填
         this.start = config.start; // 一个数组表示开始时间，如[2017,8,31]，选填
         this.end = config.end; // 一个数组表示结束时间，如[2019,11,11]，选填
         // 初始显示的时间
@@ -107,6 +108,9 @@
             this.container = this.wrapId + '-container'; // 选择器容器ID
             this.cancel = this.wrapId + '-cancel'; // 选择器取消按钮ID
             this.sure = this.wrapId + '-sure'; // 选择器确定按钮ID
+            // 储存当前各项时间是否处在边界上的数组，-1表示在开始边界，1表示在结束边界，
+            // 0表示不在边界上，2在边界上且开始项等于结束项
+            this.borderArr = [0, 0, 0, 0, 0]; 
         },
         /**
          * 定义初始化 UI 函数
@@ -330,7 +334,7 @@
         initDateArr: function() {
             switch (this.type) {
                 case 'date':
-                    this.dateArr = [this.yearArr, this.monthArr, this.dayArr, undefined, undefined];
+                    this.dateArr = [this.yearArr, this.monthArr, this.dayArr];
                     break;
                 case 'time':
                     this.dateArr = [undefined, undefined, undefined, this.hourArr, this.minuteArr];
@@ -511,6 +515,7 @@
                     '<div class="hg-picker-line"></div>' +
                     '</div>' +
                     '<div class="hg-picker-btn-box">' +
+                    this.title +
                     '<div class="hg-picker-btn" id="' + this.cancel + '">返回</div>' +
                     '<div class="hg-picker-btn" id="' + this.sure + '">确定</div>' +
                     '</div>' +
@@ -518,6 +523,7 @@
             } else {
                 var html = '<div  class="hg-picker-container" id="' + this.container + '">' +
                     '<div class="hg-picker-btn-box">' +
+                    this.title +
                     '<div class="hg-picker-btn" id="' + this.cancel + '">返回</div>' +
                     '<div class="hg-picker-btn" id="' + this.sure + '">确定</div>' +
                     '</div>' +
