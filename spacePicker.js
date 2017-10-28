@@ -27,7 +27,7 @@
         this.showKey = config.showKey || 'value'; // 展示数据的键名，选填
         this.childKey = config.childKey || 'child'; // 子数据的键名，选填
         this.success = config.success; // 确定按钮回调函数，必填
-        this.abolish = config.abolish || null; // 取消按钮回调函数，选填
+        this.cancel = config.cancel || null; // 取消按钮回调函数，选填
         this.title = config.title || ''; // 选择器标题，选填
         this.sureText = config.sureText || '确定'; // 确定按钮文本，选填
         this.cancelText = config.cancelText || '取消'; // 取消按钮文本，选填
@@ -64,7 +64,7 @@
             this.endTime = 0; // touchend的时间 
             this.moveY = 0; // touchmove的位置
             this.container = this.wrapId + '-container'; // 选择器容器ID
-            this.cancel = this.wrapId + '-cancel'; // 选择器取消按钮ID
+            this.abolish = this.wrapId + '-abolish'; // 选择器取消按钮ID
             this.sure = this.wrapId + '-sure'; // 选择器确定按钮ID
             this.content = this.wrapId + '-content'; // 选择器内容容器ID
         },
@@ -94,26 +94,24 @@
             var container = $id(that.container);
 
             // 点击目标DOM元素显示选择器
-            $id(that.inputId).addEventListener('touchstart', function() {
+            $id(that.inputId).addEventListener('click', function() {
                 that.show(wrap, container);
             })
 
             // 点击确定按钮隐藏选择器并输出结果
-            $id(that.sure).addEventListener('touchstart', function() {
+            $id(that.sure).addEventListener('click', function() {
                 that.success(that.getResult());
                 that.hide(wrap, container);
             })
 
             // 点击取消隐藏选择器
-            $id(that.cancel).addEventListener('touchstart', function() {
-                if (that.abolish) {
-                    that.abolish();
-                };
+            $id(that.abolish).addEventListener('click', function() {
+                that.cancel && that.cancel();
                 that.hide(wrap, container);
             })
 
             // 点击背景隐藏选择器
-            wrap.addEventListener('touchstart', function(e) {
+            wrap.addEventListener('click', function(e) {
                 if (e.target.id === that.wrapId) {
                     that.hide(wrap, container);
                 }
@@ -187,7 +185,7 @@
                     '</div>' +
                     '<div class="hg-picker-btn-box">' +
                     this.title +
-                    '<div class="hg-picker-btn" id="' + this.cancel + '">' + this.cancelText + '</div>' +
+                    '<div class="hg-picker-btn" id="' + this.abolish + '">' + this.cancelText + '</div>' +
                     '<div class="hg-picker-btn" id="' + this.sure + '">' + this.sureText + '</div>' +
                     '</div>' +
                     '</div>';
@@ -195,7 +193,7 @@
                 var html = '<div  class="hg-picker-container" id="' + this.container + '">' +
                     '<div class="hg-picker-btn-box">' +
                     this.title +
-                    '<div class="hg-picker-btn" id="' + this.cancel + '">' + this.cancelText + '</div>' +
+                    '<div class="hg-picker-btn" id="' + this.abolish + '">' + this.cancelText + '</div>' +
                     '<div class="hg-picker-btn" id="' + this.sure + '">' + this.sureText + '</div>' +
                     '</div>' +
                     '<div class="hg-picker-content" id="' + this.content + '">' +
