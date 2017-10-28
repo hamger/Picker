@@ -32,6 +32,8 @@
         this.inputId = config.inputId; // 目标 input 元素，必填
         this.type = config.type || 'date'; // 选择器类型，选填
         this.title = config.title || ''; // 选择器标题，选填
+        this.sureText = config.sureText || '确定'; // 确定按钮文本，选填
+        this.cancelText = config.cancelText || '取消'; // 取消按钮文本，选填
         // 初始化开始、结束、初始显示时间, 选填
         if (this.type === 'time') {
             if (config.start) {
@@ -79,8 +81,8 @@
         this.hasSuffix = config.hasSuffix || 'yes'; // 是否添加时间单位，选填
         this.hasZero = config.hasZero || 'yes'; // 一位数是否显示两位，选填
         this.success = config.success; // 成功的回调函数，必填
-        this.error = config.error; // 失败（选择的时间不在规定内）的回调函数，选填
-        this.check();
+        this.cancel = config.cancel || null; // 取消按钮回调函数，选填
+        this.check(); // 检查配置项是否合法
         this.initTab(); // 初始化标签
         this.initUI(); // 初始化UI
         this.initEvent(); // 初始化事件
@@ -181,7 +183,7 @@
             this.endTime = 0; // touchend的时间 
             this.moveY = 0; // touchmove的位置
             this.container = this.wrapId + '-container'; // 选择器容器ID
-            this.cancel = this.wrapId + '-cancel'; // 选择器取消按钮ID
+            this.abolish = this.wrapId + '-abolish'; // 选择器取消按钮ID
             this.sure = this.wrapId + '-sure'; // 选择器确定按钮ID
         },
         /**
@@ -227,12 +229,12 @@
             var container = $id(that.container);
 
             // 点击目标元素显示选择器
-            $id(that.inputId).addEventListener('touchstart', function() {
+            $id(that.inputId).addEventListener('click', function() {
                 that.show(wrap, container)
             })
 
             // 点击保存按钮隐藏选择器并输出结果
-            $id(that.sure).addEventListener('touchstart', function() {
+            $id(that.sure).addEventListener('click', function() {
                 var resuArr = [
                     that.curDate(0),
                     that.curDate(1),
@@ -245,12 +247,13 @@
             })
 
             // 点击取消隐藏选择器
-            $id(that.cancel).addEventListener('touchstart', function() {
+            $id(that.abolish).addEventListener('click', function() {
+                that.cancel && that.cancel()
                 that.hide(wrap, container)
             })
 
             // 点击背景隐藏选择器
-            wrap.addEventListener('touchstart', function(e) {
+            wrap.addEventListener('click', function(e) {
                 if (e.target.id === that.wrapId) {
                     that.hide(wrap, container)
                 }
@@ -459,16 +462,16 @@
                     '</div>' +
                     '<div class="hg-picker-btn-box">' +
                     this.title +
-                    '<div class="hg-picker-btn" id="' + this.cancel + '">返回</div>' +
-                    '<div class="hg-picker-btn" id="' + this.sure + '">确定</div>' +
+                    '<div class="hg-picker-btn" id="' + this.abolish + '">' + this.cancelText + '</div>' +
+                    '<div class="hg-picker-btn" id="' + this.sure + '">' + this.sureText + '</div>' +
                     '</div>' +
                     '</div>';
             } else {
                 var html = '<div  class="hg-picker-container" id="' + this.container + '">' +
                     '<div class="hg-picker-btn-box">' +
                     this.title +
-                    '<div class="hg-picker-btn" id="' + this.cancel + '">返回</div>' +
-                    '<div class="hg-picker-btn" id="' + this.sure + '">确定</div>' +
+                    '<div class="hg-picker-btn" id="' + this.abolish + '">' + this.cancelText + '</div>' +
+                    '<div class="hg-picker-btn" id="' + this.sure + '">' + this.sureText + '</div>' +
                     '</div>' +
                     '<div class="hg-picker-content">';
                 for (var i = 0; i < len; i++) {
