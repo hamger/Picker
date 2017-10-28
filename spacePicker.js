@@ -24,8 +24,13 @@
     function SpacePicker(config) {
         this.inputId = config.inputId; // 目标DOM元素ID，必填
         this.data = config.data; // json 数据，必填
-        this.success = config.success; // 回调函数，必填
+        this.showKey = config.showKey || 'value'; // 展示数据的键名，选填
+        this.childKey = config.childKey || 'child'; // 子数据的键名，选填
+        this.success = config.success; // 确定按钮回调函数，必填
+        this.abolish = config.abolish || null; // 取消按钮回调函数，选填
         this.title = config.title || ''; // 选择器标题，选填
+        this.sureText = config.sureText || '确定'; // 确定按钮文本，选填
+        this.cancelText = config.cancelText || '取消'; // 取消按钮文本，选填
         this.style = config.style; // 选择器样式, 选填
         this.initTab(); // 初始化标签
         this.initUI(); // 初始化UI
@@ -93,7 +98,7 @@
                 that.show(wrap, container);
             })
 
-            // 点击保存按钮隐藏选择器并输出结果
+            // 点击确定按钮隐藏选择器并输出结果
             $id(that.sure).addEventListener('touchstart', function() {
                 that.success(that.getResult());
                 that.hide(wrap, container);
@@ -101,6 +106,9 @@
 
             // 点击取消隐藏选择器
             $id(that.cancel).addEventListener('touchstart', function() {
+                if (that.abolish) {
+                    that.abolish();
+                };
                 that.hide(wrap, container);
             })
 
@@ -128,11 +136,13 @@
             @i 当前操作列索引
         */
         getRelatedArr: function(obj, i) {
-            if ('child' in obj && obj.child.length > 0) {
-                this.relatedArr[i + 1] = obj.child
-                this.renderCount++
-                    this.getRelatedArr(obj.child[0], ++i)
-            }
+            if (typeof obj === 'object') {
+                if (this.childKey in obj && obj[this.childKey].length > 0) {
+                    this.relatedArr[i + 1] = obj[this.childKey]
+                    this.renderCount++
+                    this.getRelatedArr(obj[this.childKey][0], ++i)
+                }
+            };
         },
         /**
         * 更新 ulCount 和子数据的参数
@@ -149,23 +159,27 @@
             };
         },
         /**
-         * 获取每列关联数据的 value 值
+         * 获取每列关联数据的展示数据
          * Return : Array
          * Explain : @arr 需要被取值的对象数组
          */
         getValue: function(arr) {
             var tempArr = [];
             for (var i = 0; i < arr.length; i++) {
-                tempArr.push(arr[i].value);
+                if (typeof arr[i][this.showKey] === 'object') {
+                    tempArr.push(arr[i][this.showKey][this.showKey]);
+                } else {
+                    tempArr.push(arr[i][this.showKey]);
+                }
             }
             return tempArr;
         },
         /**
-         * 渲染时间选择器的内容
+         * 渲染地区选择器的内容
          */
         renderContent: function() {
             if (this.style && this.style.btnLocation === 'bottom') {
-                var html = '<div class="hg-picker-container" id="' + this.container + '">' +
+                var html = '<div  class="hg-picker-container" id="' + this.container + '">' +
                     '<div class="hg-picker-content" id="' + this.content + '">' +
                     '<div class="hg-picker-up-shadow"></div>' +
                     '<div class="hg-picker-down-shadow"></div>' +
@@ -173,16 +187,16 @@
                     '</div>' +
                     '<div class="hg-picker-btn-box">' +
                     this.title +
-                    '<div class="hg-picker-btn" id="' + this.cancel + '">返回</div>' +
-                    '<div class="hg-picker-btn" id="' + this.sure + '">确定</div>' +
+                    '<div class="hg-picker-btn" id="' + this.cancel + '">' + this.cancelText + '</div>' +
+                    '<div class="hg-picker-btn" id="' + this.sure + '">' + this.sureText + '</div>' +
                     '</div>' +
                     '</div>';
             } else {
-                var html = '<div class="hg-picker-container" id="' + this.container + '">' +
+                var html = '<div  class="hg-picker-container" id="' + this.container + '">' +
                     '<div class="hg-picker-btn-box">' +
                     this.title +
-                    '<div class="hg-picker-btn" id="' + this.cancel + '">返回</div>' +
-                    '<div class="hg-picker-btn" id="' + this.sure + '">确定</div>' +
+                    '<div class="hg-picker-btn" id="' + this.cancel + '">' + this.cancelText + '</div>' +
+                    '<div class="hg-picker-btn" id="' + this.sure + '">' + this.sureText + '</div>' +
                     '</div>' +
                     '<div class="hg-picker-content" id="' + this.content + '">' +
                     '<div class="hg-picker-up-shadow"></div>' +
@@ -294,7 +308,7 @@
             }
         },
         /**
-         * 时间选择器触摸事件
+         * 地区选择器触摸事件
          */
         touch: function(i) {
             var event = event || window.event;
@@ -392,7 +406,7 @@
         getResult: function() {
             var arr = []
             for (var i = 0; i < this.ulCount; i++) {
-                arr.push(this.getValue(this.relatedArr[i])[this.spaceIndex[i]])
+                arr.push(this.relatedArr[i][this.spaceIndex[i]])
             }
             return arr
         },
