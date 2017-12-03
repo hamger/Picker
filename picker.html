@@ -70,8 +70,8 @@
     <article>
         <input id="space-input" type="text" placeholder="选择中国城市" value=""/>
     </article>
-    <script src="./datePicker.js"></script>
-    <script src="./spacePicker.js"></script>
+    <script src="./datePicker/datePicker.js"></script>
+    <script src="./spacePicker/spacePicker.js"></script>
     <script src="./city.js"></script>
     <script>
     var now = new Date()
@@ -94,9 +94,14 @@
             btnLocation: 'bottom',
             radius: '10px'
         },
-        title: '选择日期',
+        forbid: {
+            week: [0, 1, 1, 1, 1, 1, 0]
+        },
+        title: '日期选择',
+        cancel: function () {
+            console.log('取消日期选择');
+        },
         success: function(arr) { // 回调函数
-            console.log(arr);
             document.getElementById('date-input').value = arr;
         }
     });
@@ -105,7 +110,7 @@
         type: 'time', // 选择器类型
         style: {
             location: 'center',
-            radius: '4px'
+            radius: '6px'
         },
         success: function(arr) {
             console.log(arr);
@@ -115,6 +120,12 @@
     new DatePicker({
         inputId: 'date-input3',
         type: 'dateTime',
+        start: [1920, 1, 1, 12, 45], // 开始时间
+        end: [2120, 1, 1, 12, 45], // 结束时间
+        style: {
+            location: 'center',
+            radius: '4px'
+        },
         hasSuffix: 'no', // 不添加时间单位
         hasZero: 'no', // 单位数不显两位
         success: function(arr) {
@@ -124,11 +135,17 @@
     });
     new SpacePicker({
         inputId: 'space-input',
-        title: '选择城市',
         data: city, // 符合格式的 json 数据
+        cancel: function () {
+            console.log('取消城市选择');
+        },
         success: function(arr) {
             console.log(arr);
-            document.getElementById('space-input').value = arr;
+            var arr2 = [];
+            arr.forEach(function(val) {
+                arr2.push(val.value);
+            });
+            document.getElementById('space-input').value = arr2;
         }
     });
     </script>
