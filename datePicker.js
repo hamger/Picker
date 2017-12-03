@@ -78,6 +78,7 @@
             ];
         }
         this.style = config.style; // 选择器样式, 选填
+        // this.forbidWeek = config.forbid.week || [1, 1, 1, 1, 1, 1, 1];
         this.hasSuffix = config.hasSuffix || 'yes'; // 是否添加时间单位，选填
         this.hasZero = config.hasZero || 'yes'; // 一位数是否显示两位，选填
         this.success = config.success; // 成功的回调函数，必填
@@ -94,7 +95,9 @@
     DatePicker.prototype = {
         // 明确构造器指向
         constructor: DatePicker,
-        // 检查配置项是否合法
+        /**
+         * 检查配置项是否合法
+         */
         check: function() {
             function isNumberArr(arr) {
                 if (arr instanceof Array) {
@@ -182,6 +185,10 @@
             this.endY = 0; // touchend的位置 
             this.endTime = 0; // touchend的时间 
             this.moveY = 0; // touchmove的位置
+            this.moveTime = 0; // touchmove的时间
+            // this.moveTempY = 0; // touchmove的位置记录
+            this.moveNumber = 1; // touchmove规定时间间隔下的次数
+            this.moveSpeed = []; // touchmove规定时间间隔下的平均速度
             this.container = this.wrapId + '-container'; // 选择器容器ID
             this.abolish = this.wrapId + '-abolish'; // 选择器取消按钮ID
             this.sure = this.wrapId + '-sure'; // 选择器确定按钮ID
@@ -276,6 +283,7 @@
         },
         /**
          * 计算并返回当前项显示的数组
+         * Explain : @i 需要处理的列的索引
          */
         calculateArr: function(i) {
             switch (i) {
@@ -302,7 +310,8 @@
                     break;
                 case 2:
                     this.dayArr = []
-                        // 如果是闰年，2月改为29天
+                        
+                    // 如果是闰年，2月改为29天
                     if (this.isLeapYear(this.curDate(i - 2))) {
                         this.dayNumArr[1] = 29
                     } else {
@@ -332,6 +341,10 @@
                     break;
             }
         },
+        /**
+         * 获取对应列的所有数据
+         * Explain : @i 需要处理的列的索引
+         */
         getCurArr: function(i) {
             var curArr = []
             switch (i) {
@@ -353,9 +366,14 @@
             }
             return curArr
         },
+        /**
+         * 获取对应列的结果
+         * Explain : @i 需要处理的列的索引
+         */
         curDate: function(i) {
             var curDate
-                // this.dateArr 还没有被赋值的情况
+            
+            // this.dateArr 还没有被赋值的情况
             if (this.dateArr.length === 0) {
                 curDate = this.firstTime[i]
             } else {
@@ -369,6 +387,7 @@
         },
         /**
          * 计算并返回当前项所在的位置
+         * Explain : @i 需要处理的列的索引
          */
         calculateDis: function(i) {
             var curArr = this.getCurArr(i);
@@ -417,6 +436,7 @@
         },
         /**
          * 判断每个 ul 中有多少个 li 选项
+         * Explain : @index 需要处理的列的索引
          */
         initLiNum: function(index) {
             if (index) {
@@ -528,6 +548,7 @@
         },
         /**
          * 渲染 ul 元素
+         * Explain : @i 需要处理的列的索引
          * Return : String
          */
         renderUl: function(i) {
@@ -536,6 +557,7 @@
         },
         /**
          * 渲染 li 元素
+         * Explain : @i 需要处理的列的索引
          */
         renderLi: function(i) {
             var that = this;
@@ -549,7 +571,9 @@
             that.dateUl[i].innerHTML = lis;
         },
         /**
-         * 改变时间的显示位置
+         * 控制列表的滚动
+         * Explain : @i 需要处理的列的索引
+         * @time 滚动持续时间
          */
         roll: function(i, time) {
             if (this.curDis[i] || this.curDis[i] === 0) {
@@ -561,13 +585,14 @@
                     this.dateUl[i].style.webkitTransform = 'translate3d(0,' + Math.abs(this.curDis[i]) + 'px, 0)';
                 }
                 if (time) {
-                    this.dateUl[i].style.transition = 'transform ' + time + 's ease-out';
-                    this.dateUl[i].style.webkitTransition = '-webkit-transform ' + time + 's ease-out';
+                    this.dateUl[i].style.transition = 'transform ' + time + 's ease';
+                    this.dateUl[i].style.webkitTransition = '-webkit-transform ' + time + 's ease';
                 }
             }
         },
         /**
          * 时间选择器触摸事件
+         * Explain : @i 需要处理的列的索引
          */
         touch: function(i) {
             var event = event || window.event;
@@ -575,14 +600,38 @@
             switch (event.type) {
                 case "touchstart":
                     this.startY = event.touches[0].clientY;
-                    this.startTime = new Date();
+                    this.startTime = Date.now();
                     this.curPos[i] = this.curDis[i];
                     this.previousTime[i] = this.curDate(i);
+                    this.moveNumber = 1;
+                    this.moveSpeed = [];
+                    break;
+                case "touchmove":
+                    event.preventDefault();
+                    this.moveY = event.touches[0].clientY;
+                    var offset  = this.moveY - this.startY; // 向下为正数，向上为负数
+                    this.moveTime = Date.now();
+                    this.curDis[i] = this.startY - this.moveY + this.curPos[i];
+                    if (this.curDis[i] <= -1.5 * this.liHeight) {
+                        this.curDis[i] = -1.5 * this.liHeight
+                    }
+                    if (this.curDis[i] >= (this.liNum[i] - 1 + 1.5) * this.liHeight) {
+                        this.curDis[i] = (this.liNum[i] - 1 + 1.5) * this.liHeight
+                    }
+                    this.roll(i);
+                    // 每运动 150 毫秒，记录一次速度
+                    if (this.moveTime - this.startTime >= 150 * this.moveNumber) {
+                        this.moveNumber++;
+                        this.moveSpeed.push(offset / (this.moveTime - this.startTime)).toFixed(2);
+                    }
                     break;
                 case "touchend":
-                    this.endTime = new Date();
-                    if (this.endTime - this.startTime < 150) { // 点击跳入下一项
+                    this.endTime = Date.now();
+                    var speed = this.moveSpeed[this.moveSpeed.length - 1] || 0;
+                    if (this.moveSpeed.length === 0) { // 点击跳入下一项
                         this.curDis[i] = this.curPos[i] + this.liHeight;
+                    } else {
+                        this.curDis[i] = this.curDis[i] - this.calculateBuffer(speed, 0.008);
                     }
                     this.fixate(i);
                     switch (i) {
@@ -595,24 +644,26 @@
                             break;
                     }
                     this.roll(i, 0.2);
-                    console.log(this.end)
-                    break;
-                case "touchmove":
-                    event.preventDefault();
-                    this.moveY = event.touches[0].clientY;
-                    this.curDis[i] = this.startY - this.moveY + this.curPos[i];
-                    if (this.curDis[i] <= -1.5 * this.liHeight) {
-                        this.curDis[i] = -1.5 * this.liHeight
-                    }
-                    if (this.curDis[i] >= (this.liNum[i] - 1 + 1.5) * this.liHeight) {
-                        this.curDis[i] = (this.liNum[i] - 1 + 1.5) * this.liHeight
-                    }
-                    this.roll(i);
                     break;
             }
         },
         /**
-         * 确定 ul 最终的位置并储存结果
+         * 计算滚动缓冲距离
+         * Return : Number
+         * Explain : @v 速度（正负表示运动方向, 单位 px/ms）
+         * @a 加速度（正数, 单位 px/(ms * ms)）
+         */
+        calculateBuffer: function (v, a) {
+            if (Math.abs(v) > 1.24) {
+                let result = (v / Math.abs(v)) * (0.5 * v * v / a).toFixed(2);
+                return result;
+            } else {
+                return 0;
+            }
+        },
+         /**
+         * 确定 ul 最终的位置
+         * Explain : @i 需要定位的列的索引
          */
         fixate: function(i) {
             var liRow = Math.round((this.curDis[i] / this.liHeight).toFixed(2))
@@ -627,7 +678,7 @@
         },
         /**
          * 边界判断
-         * Explain : @i 判断边界的列索引
+         * Explain : @i 需要判断边界的列的索引
          *  如果已经到边界则改变视图
          */
         changeDate: function(i) {
@@ -640,6 +691,7 @@
         },
         /**
          * 判断是否是闰年
+         * Explain : @year 年份
          */
         isLeapYear: function(year) {
             var cond1 = year % 4 === 0;
@@ -667,6 +719,8 @@
         },
         /**
          * 加零，一位数显示为两位
+         * Explain : @num 需要处理的数字
+         * Return : Number
          */
         addZero: function(num) {
             if (this.hasZero === 'yes') {
@@ -678,6 +732,8 @@
         },
         /**
          * 显示选择器
+         * Explain : @wrap 包裹层 DOM 元素
+         * @container 内容层 Dom 元素
          */
         show: function(wrap, container) {
             wrap.classList.add('hg-picker-bg-show');
@@ -685,6 +741,8 @@
         },
         /**
          * 隐藏选择器
+        * Explain : @wrap 包裹层 DOM 元素
+         * @container 内容层 Dom 元素
          */
         hide: function(wrap, container) {
             wrap.classList.remove('hg-picker-bg-show');
