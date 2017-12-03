@@ -60,9 +60,12 @@
             this.curPos = []; // 记录 touchstart 时每个ul的竖向距离
             this.startY = 0; // touchstart的位置
             this.startTime = 0; // touchstart的时间
-            this.endY = 0; // touchend的位置 
-            this.endTime = 0; // touchend的时间 
+            this.endTime = 0; // touchend的时间
             this.moveY = 0; // touchmove的位置
+            this.moveTime = 0; // touchmove的时间
+            this.moveNumber = 1; // touchmove规定时间间隔下的次数
+            this.moveSpeed = []; // touchmove规定时间间隔下的平均速度
+            this.abled = true; // 标识滚动是否进行中
             this.container = this.wrapId + '-container'; // 选择器容器ID
             this.abolish = this.wrapId + '-abolish'; // 选择器取消按钮ID
             this.sure = this.wrapId + '-sure'; // 选择器确定按钮ID
@@ -245,6 +248,7 @@
         },
         /**
          * 渲染 ul 元素
+         * Explain : @i 需要处理的列的索引
          */
         renderUl: function(i) {
             var parentNode = $id(this.content);
@@ -256,6 +260,7 @@
         },
         /**
          * 渲染 li 元素
+         * Explain : @i 需要处理的列的索引
          */
         renderLi: function(i) {
             this.spaceUl[i].innerHTML = ''
@@ -276,6 +281,7 @@
         },
         /**
          * 绑定滑动事件
+         * Explain : @i 需要处理的列的索引
          */
         bindRoll: function(i) {
             var that = this
@@ -290,7 +296,9 @@
             }, true);
         },
         /**
-         * 滚动改变位置
+         * 控制列表的滚动
+         * Explain : @i 需要处理的列的索引
+         * @time 滚动持续时间
          */
         roll: function(i, time) {
             if (this.curDis[i] >= 0) {
@@ -307,27 +315,32 @@
         },
         /**
          * 地区选择器触摸事件
+         * Explain : @i 需要处理的列的索引
          */
         touch: function(i) {
             var event = event || window.event;
             event.preventDefault();
             switch (event.type) {
                 case "touchstart":
-                    this.startY = event.touches[0].clientY;
-                    this.startTime = new Date()
-                    this.curPos[i] = this.curDis[i]; // 记录当前位置
-                    break;
-                case "touchend":
-                    this.endTime = new Date()
-                    if (this.endTime - this.startTime < 150) { // 点击跳入下一项
-                        this.curDis[i] = this.curPos[i] + this.liHeight;
+                    this.startTime = new Date();
+                    // 列表滚动中禁止二次操作
+                    if (this.startTime - this.endTime < 200) {
+                        this.abled = false;
+                        return;
+                    } else {
+                        this.abled = true;
                     }
-                    this.fixate(i);
+                    this.startY = event.touches[0].clientY;
+                    this.curPos[i] = this.curDis[i]; // 记录当前位置
+                    this.moveNumber = 1;
+                    this.moveSpeed = [];
                     break;
                 case "touchmove":
+                    if (!this.abled) return;
                     event.preventDefault();
                     this.moveY = event.touches[0].clientY;
-                    this.curDis[i] = this.startY - this.moveY + this.curPos[i];
+                    var offset  = this.startY - this.moveY; // 向上为正数，向下为负数
+                    this.curDis[i] = offset + this.curPos[i];
                     if (this.curDis[i] <= -1.5 * this.liHeight) {
                         this.curDis[i] = -1.5 * this.liHeight
                     }
@@ -335,11 +348,38 @@
                         this.curDis[i] = (this.liNum[i] - 1 + 1.5) * this.liHeight
                     }
                     this.roll(i);
+                    // 每运动 130 毫秒，记录一次速度
+                    if (this.moveTime - this.startTime >= 130 * this.moveNumber) {
+                        this.moveNumber++;
+                        this.moveSpeed.push(offset / (this.moveTime - this.startTime));
+                    }
+                    break;
+                case "touchend":
+                    if (!this.abled) return;
+                    this.endTime = Date.now();
+                    var speed = this.moveSpeed[this.moveSpeed.length - 1] || 0;
+                    this.curDis[i] = this.curDis[i] + this.calculateBuffer(speed, 0.001);
+                    this.fixate(i);
                     break;
             }
         },
         /**
+         * 计算滚动缓冲距离
+         * Return : Number
+         * Explain : @v 速度（正负表示运动方向, 单位 px/ms）
+         * @a 加速度（正数, 单位 px/(ms * ms)）
+         */
+        calculateBuffer: function (v, a) {
+            if (Math.abs(v) > 0.85) {
+                let result = (v / Math.abs(v)) * (0.5 * v * v / a);
+                return result;
+            } else {
+                return 0;
+            }
+        },
+        /**
          * 固定 ul 最终的位置、更新视图
+         * Explain : @i 需要处理的列的索引
          */
         fixate: function(i) {
             this.renderCount = 0;
@@ -353,6 +393,7 @@
         },
         /**
          * 获取定位数据
+         * Explain : @i 需要处理的列的索引
          */
         getPosition: function(i) {
             var index = 0;
@@ -372,6 +413,7 @@
         },
         /**
          * 更新内容区视图
+         * Explain : @i 需要处理的列的索引
          */
         updateView: function(i) {
             var curUlCount = $id(this.content).children.length - 3
@@ -410,6 +452,8 @@
         },
         /**
          * 显示选择器
+         * Explain : @wrap 包裹层 DOM 元素
+            @container 内容层 Dom 元素
          */
         show: function(wrap, container) {
             wrap.classList.add('hg-picker-bg-show');
@@ -417,6 +461,8 @@
         },
         /**
          * 隐藏选择器
+         * Explain : @wrap 包裹层 DOM 元素
+            @container 内容层 Dom 元素
          */
         hide: function(wrap, container) {
             wrap.classList.remove('hg-picker-bg-show');
