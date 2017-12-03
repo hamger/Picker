@@ -182,13 +182,12 @@
             this.curPos = []; // touchstart时每个ul偏离的距离
             this.startY = 0; // touchstart的位置
             this.startTime = 0; // touchstart的时间
-            this.endY = 0; // touchend的位置 
-            this.endTime = 0; // touchend的时间 
+            this.endTime = 0; // touchend的时间
             this.moveY = 0; // touchmove的位置
             this.moveTime = 0; // touchmove的时间
-            // this.moveTempY = 0; // touchmove的位置记录
             this.moveNumber = 1; // touchmove规定时间间隔下的次数
             this.moveSpeed = []; // touchmove规定时间间隔下的平均速度
+            this.abled = true; // 标识滚动是否进行中
             this.container = this.wrapId + '-container'; // 选择器容器ID
             this.abolish = this.wrapId + '-abolish'; // 选择器取消按钮ID
             this.sure = this.wrapId + '-sure'; // 选择器确定按钮ID
@@ -585,8 +584,8 @@
                     this.dateUl[i].style.webkitTransform = 'translate3d(0,' + Math.abs(this.curDis[i]) + 'px, 0)';
                 }
                 if (time) {
-                    this.dateUl[i].style.transition = 'transform ' + time + 's ease';
-                    this.dateUl[i].style.webkitTransition = '-webkit-transform ' + time + 's ease';
+                    this.dateUl[i].style.transition = 'transform ' + time + 's linear';
+                    this.dateUl[i].style.webkitTransition = '-webkit-transform ' + time + 's linear';
                 }
             }
         },
@@ -599,19 +598,27 @@
             event.preventDefault();
             switch (event.type) {
                 case "touchstart":
-                    this.startY = event.touches[0].clientY;
                     this.startTime = Date.now();
+                    // 列表滚动中禁止二次操作
+                    if (this.startTime - this.endTime < 200) {
+                        this.abled = false;
+                        return;
+                    } else {
+                        this.abled = true;
+                    }
+                    this.startY = event.touches[0].clientY;
                     this.curPos[i] = this.curDis[i];
                     this.previousTime[i] = this.curDate(i);
                     this.moveNumber = 1;
                     this.moveSpeed = [];
                     break;
                 case "touchmove":
+                    if (!this.abled) return;
                     event.preventDefault();
                     this.moveY = event.touches[0].clientY;
-                    var offset  = this.moveY - this.startY; // 向下为正数，向上为负数
+                    var offset  = this.startY - this.moveY; // 向上为正数，向下为负数
                     this.moveTime = Date.now();
-                    this.curDis[i] = this.startY - this.moveY + this.curPos[i];
+                    this.curDis[i] = offset + this.curPos[i];
                     if (this.curDis[i] <= -1.5 * this.liHeight) {
                         this.curDis[i] = -1.5 * this.liHeight
                     }
@@ -619,20 +626,17 @@
                         this.curDis[i] = (this.liNum[i] - 1 + 1.5) * this.liHeight
                     }
                     this.roll(i);
-                    // 每运动 150 毫秒，记录一次速度
-                    if (this.moveTime - this.startTime >= 150 * this.moveNumber) {
+                    // 每运动 130 毫秒，记录一次速度
+                    if (this.moveTime - this.startTime >= 130 * this.moveNumber) {
                         this.moveNumber++;
-                        this.moveSpeed.push(offset / (this.moveTime - this.startTime)).toFixed(2);
+                        this.moveSpeed.push(offset / (this.moveTime - this.startTime));
                     }
                     break;
                 case "touchend":
+                    if (!this.abled) return;
                     this.endTime = Date.now();
                     var speed = this.moveSpeed[this.moveSpeed.length - 1] || 0;
-                    if (this.moveSpeed.length === 0) { // 点击跳入下一项
-                        this.curDis[i] = this.curPos[i] + this.liHeight;
-                    } else {
-                        this.curDis[i] = this.curDis[i] - this.calculateBuffer(speed, 0.008);
-                    }
+                    this.curDis[i] = this.curDis[i] + this.calculateBuffer(speed, 0.001);
                     this.fixate(i);
                     switch (i) {
                         case 0:
@@ -654,8 +658,8 @@
          * @a 加速度（正数, 单位 px/(ms * ms)）
          */
         calculateBuffer: function (v, a) {
-            if (Math.abs(v) > 1.24) {
-                let result = (v / Math.abs(v)) * (0.5 * v * v / a).toFixed(2);
+            if (Math.abs(v) > 0.85) {
+                let result = (v / Math.abs(v)) * (0.5 * v * v / a);
                 return result;
             } else {
                 return 0;
@@ -733,7 +737,7 @@
         /**
          * 显示选择器
          * Explain : @wrap 包裹层 DOM 元素
-         * @container 内容层 Dom 元素
+            @container 内容层 Dom 元素
          */
         show: function(wrap, container) {
             wrap.classList.add('hg-picker-bg-show');
@@ -741,8 +745,8 @@
         },
         /**
          * 隐藏选择器
-        * Explain : @wrap 包裹层 DOM 元素
-         * @container 内容层 Dom 元素
+         * Explain : @wrap 包裹层 DOM 元素
+            @container 内容层 Dom 元素
          */
         hide: function(wrap, container) {
             wrap.classList.remove('hg-picker-bg-show');
