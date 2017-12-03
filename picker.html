@@ -12,40 +12,41 @@
     <style>
     body {
         background-color: #fff;
+        margin: 0;
+        padding: 0;
     }
 
-    h3 {
+    .wraper {
+        margin-bottom: 15px;
+    }
+
+    .title {
         position: relative;
         width: 100%;
-        height: 50px;
-        line-height: 50px;
+        height: 48px;
+        line-height: 48px;
         text-align: center;
         color: #000;
     }
 
-    h3:after {
+    .title:after {
         content: '';
         position: absolute;
         width: 100px;
         height: 5px;
-        left: 50%;
+        left: 48%;
         bottom: 0;
-        margin: 0 -50px;
+        margin: 0 -42px;
         background: #bbb;
         border-radius: 10px;
     }
 
-    article {
+    .inputDiv {
         color: #333;
-        line-height: 1.3;
-        padding: 0 30px;
-        margin: 20px 0;
-    }
-
-    input {
-        display: block;
         width: 200px;
-        margin: 5px auto 10px;
+        height: 20px;
+        line-height: 20px;
+        margin: 10px auto;
         padding: 5px 20px;
         border: 1px solid #bbb;
         border-radius: 8px;
@@ -54,21 +55,21 @@
 </head>
 
 <body>
-    <h3>datePicker</h3>
-    <article>
-        <input id="date-input" type="text" placeholder="选择年月日" value=""/>
+    <article class="wraper">
+        <h3 class="title">datePicker</h3>
+        <div class="inputDiv" id="date-input"/>选择年月日</div>
     </article>
-    <h3>timeSelector</h3>
-    <article>
-        <input id="date-input2" type="text" placeholder="选择时分" value=""/>
+    <article class="wraper">
+        <h3 class="title">timeSelector</h3>
+        <div class="inputDiv" id="date-input2"/>选择时分</div>
     </article>
-    <h3>dateTimeSelector</h3>
-    <article>
-        <input id="date-input3" type="text" placeholder="选择年月日时分" value=""/>
+    <article class="wraper">
+        <h3 class="title">dateTimeSelector</h3>
+        <div class="inputDiv" id="date-input3"/>选择年月日时分</div>
     </article>
-    <h3>spacePicker</h3>
-    <article>
-        <input id="space-input" type="text" placeholder="选择中国城市" value=""/>
+    <article class="wraper">
+        <h3 class="title">spacePicker</h3>
+        <div class="inputDiv" id="space-input"/>选择中国城市</div>
     </article>
     <script src="./datePicker/datePicker.js"></script>
     <script src="./spacePicker/spacePicker.js"></script>
@@ -102,7 +103,7 @@
             console.log('取消日期选择');
         },
         success: function(arr) { // 回调函数
-            document.getElementById('date-input').value = arr;
+            document.getElementById('date-input').innerHTML = arr;
         }
     });
     new DatePicker({
@@ -114,7 +115,7 @@
         },
         success: function(arr) {
             console.log(arr);
-            document.getElementById('date-input2').value = arr;
+            document.getElementById('date-input2').innerHTML = arr;
         }
     });
     new DatePicker({
@@ -130,7 +131,7 @@
         hasZero: 'no', // 单位数不显两位
         success: function(arr) {
             console.log(arr);
-            document.getElementById('date-input3').value = arr;
+            document.getElementById('date-input3').innerHTML = arr;
         }
     });
     new SpacePicker({
@@ -145,7 +146,7 @@
             arr.forEach(function(val) {
                 arr2.push(val.value);
             });
-            document.getElementById('space-input').value = arr2;
+            document.getElementById('space-input').innerHTML = arr2;
         }
     });
     </script>
