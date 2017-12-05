@@ -261,6 +261,7 @@
             // 点击背景隐藏选择器
             wrap.addEventListener('click', function(e) {
                 if (e.target.id === that.wrapId) {
+                    that.cancel && that.cancel()
                     that.hide(wrap, container)
                 }
             })
