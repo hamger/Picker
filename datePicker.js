@@ -659,12 +659,8 @@
          * @a 加速度（正数, 单位 px/(ms * ms)）
          */
         calculateBuffer: function (v, a) {
-            if (Math.abs(v) > 0.85) {
-                let result = (v / Math.abs(v)) * (0.5 * v * v / a);
-                return result;
-            } else {
-                return 0;
-            }
+            if (Math.abs(v) > 0.85) return (v / Math.abs(v)) * (0.5 * v * v / a);
+            else return 0;
         },
          /**
          * 确定 ul 最终的位置
