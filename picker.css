@@ -23,11 +23,9 @@
 
 .hg-picker-container {
     width: 100%;
-    height: 256px;
+    height: 240px;
     position: absolute;
     bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
     background-color: #FFF;
     overflow: hidden;
     display: none;
@@ -35,8 +33,8 @@
 
 .hg-picker-btn-box {
     text-align: center;
-    height: 44px;
-    line-height: 44px;
+    height: 40px;
+    line-height: 40px;
     background: rgba(218, 218, 218, .7);
 }
 
@@ -58,7 +56,7 @@
     overflow: hidden;
     position: relative;
     height: 200px;
-    margin: 6px 0;
+    line-height: 40px;
 }
 
 .hg-picker-content ul {
@@ -77,27 +75,26 @@
     height: 40px;
     text-align: center;
     font-size: 16px;
-    line-height: 40px;
     list-style: none;
     overflow: hidden;
 }
 
-
 .hg-picker-up-shadow,
 .hg-picker-down-shadow {
-    height: 80px;
+    height: 120px;
+    width: 100%;
     position: absolute;
     pointer-events: none;
 }
 
 .hg-picker-up-shadow {
     top: 0;
-    background-image: linear-gradient(to bottom, #FFF, rgba(255, 255, 255, 0));
+    background-image: linear-gradient(to bottom, rgb(255, 255, 255), rgba(255, 255, 255, 0));
 }
 
 .hg-picker-down-shadow {
     bottom: 0;
-    background-image: linear-gradient(to top, #FFF, rgba(255, 255, 255, 0));
+    background-image: linear-gradient(to top, rgb(255, 255, 255), rgba(255, 255, 255, 0));
 }
 
 .hg-picker-line {
