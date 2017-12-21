@@ -14,6 +14,16 @@
     }
 
     /**
+     * 设置子元素样式
+     */
+    function setChildStyle(parent, key, val) {
+        var children = parent.children;
+        for (var i = 0; i < children.length; i++) {
+            children[i].style[key] = val;
+        };
+    }
+
+    /**
      * 获取从 start 到 end 的数组
      * Return : Array
      */
@@ -77,6 +87,7 @@
                 new Date().getMinutes()
             ];
         }
+        this.a = config.a || 0.001; // 惯性滚动加速度（正数, 单位 px/(ms * ms)），选填
         this.style = config.style; // 选择器样式, 选填
         // this.forbidWeek = config.forbid.week || [1, 1, 1, 1, 1, 1, 1];
         this.hasSuffix = config.hasSuffix || 'yes'; // 是否添加时间单位，选填
@@ -175,7 +186,8 @@
             this.input = $id(this.inputId); // 目标元素
             this.wrapId = this.inputId + '-wrap'; // 选择器外包裹元素ID
             this.ulCount = 0; // 展示的列数
-            this.liHeight = 40; // 每个li的高度
+            this.liHeight = this.style.liHeight ? this.style.liHeight : 40; // 每个li的高度
+            this.btnHeight = this.style.btnHeight ? this.style.btnHeight : 40; // 按钮的高度
             this.dateUl = []; // 每个ul元素
             this.liNum = []; // 每个ul中有多少个可选li
             this.curDis = []; // 每个ul当前偏离的距离
@@ -189,8 +201,11 @@
             this.moveSpeed = []; // touchmove规定时间间隔下的平均速度
             this.abled = true; // 标识滚动是否进行中
             this.container = this.wrapId + '-container'; // 选择器容器ID
+            this.box = this.wrapId + '-box'; // 选择器按钮区域ID
+            this.content = this.wrapId + '-content'; // 选择器选择区域ID
             this.abolish = this.wrapId + '-abolish'; // 选择器取消按钮ID
             this.sure = this.wrapId + '-sure'; // 选择器确定按钮ID
+            this.status = []; // 储存边界状态的数组;
         },
         /**
          * 定义初始化 UI 函数
@@ -248,7 +263,7 @@
                     that.curDate(3),
                     that.curDate(4)
                 ]
-                that.success(that.result(resuArr));
+                that.success(that.result(resuArr))
                 that.hide(wrap, container)
             })
 
@@ -470,7 +485,7 @@
             var len = this.dateArr.length;
             if (this.style && this.style.btnLocation === 'bottom') {
                 var html = '<div  class="hg-picker-container" id="' + this.container + '">' +
-                    '<div class="hg-picker-content">';
+                    '<div class="hg-picker-content" id="' + this.content + '">';
                 for (var i = 0; i < len; i++) {
                     if (this.dateArr[i] !== undefined) {
                         html += this.renderUl(i)
@@ -480,7 +495,7 @@
                     '<div class="hg-picker-down-shadow"></div>' +
                     '<div class="hg-picker-line"></div>' +
                     '</div>' +
-                    '<div class="hg-picker-btn-box">' +
+                    '<div class="hg-picker-btn-box" id="' + this.box + '">' +
                     this.title +
                     '<div class="hg-picker-btn" id="' + this.abolish + '">' + this.cancelText + '</div>' +
                     '<div class="hg-picker-btn" id="' + this.sure + '">' + this.sureText + '</div>' +
@@ -488,12 +503,12 @@
                     '</div>';
             } else {
                 var html = '<div  class="hg-picker-container" id="' + this.container + '">' +
-                    '<div class="hg-picker-btn-box">' +
+                    '<div class="hg-picker-btn-box" id="' + this.box + '">' +
                     this.title +
                     '<div class="hg-picker-btn" id="' + this.abolish + '">' + this.cancelText + '</div>' +
                     '<div class="hg-picker-btn" id="' + this.sure + '">' + this.sureText + '</div>' +
                     '</div>' +
-                    '<div class="hg-picker-content">';
+                    '<div class="hg-picker-content" id="' + this.content + '">';
                 for (var i = 0; i < len; i++) {
                     if (this.dateArr[i] !== undefined) {
                         html += this.renderUl(i)
@@ -523,27 +538,54 @@
             if (this.style) {
                 var obj = this.style
                 var container = $id(this.container);
-                if (obj.width && obj.width !== '100%') {
-                    container.style.width = obj.width;
+                var content = $id(this.content);
+                var box = $id(this.box);
+                var sureBtn = $id(this.sure);
+                var abolishBtn = $id(this.abolish);
+                // 设置高宽
+                if (obj.liHeight) {
+                    var len = content.children.length;
+                    for (var i = 0; i < this.ulCount; i++) {
+                        setChildStyle(content.children[i], 'height', this.liHeight + 'px');
+                    };
+                    content.children[len - 3].style.height = this.liHeight * 3 + 'px';
+                    content.children[len - 2].style.height = this.liHeight * 3 + 'px';
+                    content.children[len - 1].style.height = this.liHeight + 'px';
+                    content.children[len - 1].style.top = this.liHeight * 2 + 'px';
+                    content.style.height = this.liHeight * 5 + 'px';
+                    content.style.lineHeight = this.liHeight + 'px';
                 }
+                if (obj.btnHeight) {
+                    box.style.height = this.btnHeight + 'px';
+                    box.style.lineHeight = this.btnHeight + 'px';
+                }
+                if (obj.liHeight || obj.btnHeight) container.style.height = this.liHeight * 5 + this.btnHeight + 'px';
+                if (obj.width) container.style.width = obj.width;
+                // 设置圆角
+                if (obj.radius) container.style.borderRadius = obj.radius;
+                // 设置定位
+                if (obj.right) container.style.right = obj.right;
+                if (obj.left) container.style.left = obj.left;
                 if (!obj.location) {
-                    if (obj.bottom) {
-                        container.style.bottom = obj.bottom;
-                    }
-                    if (obj.top) {
-                        container.style.top = obj.top;
-                    }
+                    if (obj.bottom) container.style.bottom = obj.bottom;
+                    if (obj.top) container.style.top = obj.top;
                 } else {
-                    if (obj.location === 'bottom') { container.style.bottom = 0; }
-                    if (obj.location === 'top') { container.style.top = 0; }
+                    if (obj.location === 'bottom') container.style.bottom = 0;
+                    if (obj.location === 'top') container.style.top = 0;
                     if (obj.location === 'center') {
-                        container.style.top = '50%';
-                        container.style.transform = "translate(-50%,-50%)";
+                        container.style.top = 0.5 * (window.screen.availHeight - this.liHeight * 5 - this.btnHeight) + 'px';
                     }
                 }
-                if (obj.radius) {
-                    container.style.borderRadius = obj.radius;
-                }
+                // 设置配色
+                if(obj.titleColor) box.style.color = obj.titleColor;
+                if(obj.sureBtnColor) sureBtn.style.color = obj.sureBtnColor;
+                if(obj.abolishBtnColor) abolishBtn.style.color = obj.abolishBtnColor;
+                if(obj.btnBgColor) box.style.backgroundColor = obj.btnBgColor;
+                if(obj.contentColor) content.style.color = obj.contentColor;
+                if(obj.contentBgColor) content.style.backgroundColor = obj.contentBgColor;
+                if(obj.upShadow) content.children[len - 3].style.backgroundImage = obj.upShadow;
+                if(obj.downShadow) content.children[len - 2].style.backgroundImage = obj.downShadow;
+                if(obj.lineColor) content.children[len - 1].style.borderColor = obj.lineColor;
             }
         },
         /**
@@ -569,6 +611,9 @@
             });
             lis += '<li></li><li></li>'
             that.dateUl[i].innerHTML = lis;
+            if (this.liHeight !== 40) {  
+                setChildStyle(that.dateUl[i], 'height', this.liHeight + 'px');
+            };
         },
         /**
          * 控制列表的滚动
@@ -637,7 +682,7 @@
                     if (!this.abled) return;
                     this.endTime = Date.now();
                     var speed = this.moveSpeed[this.moveSpeed.length - 1] || 0;
-                    this.curDis[i] = this.curDis[i] + this.calculateBuffer(speed, 0.001);
+                    this.curDis[i] = this.curDis[i] + this.calculateBuffer(speed, this.a);
                     this.fixate(i);
                     switch (i) {
                         case 0:
