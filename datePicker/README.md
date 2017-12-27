@@ -41,6 +41,7 @@ a | <number> | 惯性滚动加速度（正数, 单位 px/(ms * ms)），默认 `
 style | <object> | 包含样式配置的对象
 
 `style`对象可以接受如下参数：
+
 key | value | description
 --------|------|-----
 liHeight | <number> | 每一个选择栏的高度（px），默认 `40`
