@@ -3,7 +3,7 @@
 ## Demo
 [点击这里可跳转到演示页面](https://hamger.github.io/demo/picker/picker.html)，请在移动端打开或者使用浏览器移动端调试工具打开。 
 ## 快速使用 
-首先引入文件，你也通过`npm i hg-spacepicker`下载
+首先引入文件，你也可以通过`npm i hg-spacepicker`下载`spacePicker.js`
 ```html
 <!-- 日期和地址选择器公共css样式 -->
 <link rel="stylesheet" type="text/css" href="./picker.css" />
