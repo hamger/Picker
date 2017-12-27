@@ -1,19 +1,19 @@
-# spacePicker
-移动端的地区选择器
+# datePicker
+移动端的日期选择器
 ## Demo
 [点击这里可跳转到演示页面](https://hamger.github.io/demo/picker/picker.html)，请在移动端打开或者使用浏览器移动端调试工具打开。 
 ## 快速使用 
-首先引入文件，你也通过`npm i hg-spacepicker`下载
+首先引入文件，你也通过`npm i hg-datepicker`下载
 ```html
 <!-- 日期和地址选择器公共css样式 -->
 <link rel="stylesheet" type="text/css" href="./picker.css" />
 <!-- 使用日期选择器需要引入的js文件 -->
-<script src="./spacePicker.js"></script>
+<script src="./datePicker.js"></script>
 ```
-实例化日期选择器`new SpacePicker(option)`
+实例化日期选择器`new DatePicker(option)`
 ```js
-new SpacePicker({
-    inputId: 'space-input', // 目标DOM元素ID
+new DatePicker({
+    inputId: 'date-input', // 目标DOM元素ID
     success: function(arr) { // 回调函数
         console.log(arr);
     }
@@ -25,14 +25,17 @@ new SpacePicker({
 key | value | description
 --------|------|-----
 inputId | <string> | 目标DOM元素ID，必填
-data | <array> | 符合格式的 json 数据，必填
-showKey | <string> | 展示数据的键名，默认`value`
-childKey | <string> | 子数据的键名，默认`child`
-success | <function>  |  确定后的回调函数，返回一个结果数组，必填
+success | <function>  |  确定后的回调函数，返回一个参数，该参数为表示时间的数组，如[2002,2,2]表示2002年2月2号，必填
 cancel | <function>  |  点击取消按钮或者背景后的回调函数，选填
+type | `date` \| `dateTime` \| `time` | 日期选择器的类型，`time`（分时），`dateTime`(年月日时分)，默认 `date`（年月日）
+start | <array> | 开始时间的数组，默认四年前
+end | <array> | 结束时间的数组，默认四年后
+firstTime | <array> | 初始显示时间的数组，默认当前时间
 title | <string> | 选择器标题，默认为空
 sureText | <string> | 确定按钮文本，默认为“确定”
 cancelText | <string> | 取消按钮文本，默认为“取消”
+hasSuffix | `yes` \| `no` | 是否添加时间单位，默认 `yes`
+hasZero | `yes` \| `no` | 一位数前是否加零，默认 `yes`
 f | <number> | 惯性滚动阈值（正数, 单位 px/ms），默认 `0.85`
 a | <number> | 惯性滚动加速度（正数, 单位 px/(ms * ms)），默认 `0.001`
 style | <object> | 包含样式配置的对象
