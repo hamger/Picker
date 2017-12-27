@@ -34,4 +34,5 @@ new SpacePicker({
 关于如何使用你还可以参考`picker.html`文件。
 ## 选择器配置项
 日期选择器配置项说明详见[日期选择器使用文档](https://github.com/hamger/Picker/blob/master/datePicker/README.md)
+
 地区选择器配置项说明详见[地区选择器使用文档](https://github.com/hamger/Picker/blob/master/spacePicker/README.md)
