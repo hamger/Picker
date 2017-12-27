@@ -80,7 +80,7 @@
     var a2 = now.getMonth() + 1
     var a3 = now.getDate()
 
-    var pass = new Date( now.getTime() - 86400 * 1000 * 90 )
+    var pass = new Date(now.getTime() - 86400 * 1000 * 90)
     var a4 = pass.getFullYear() 
     var a5 = pass.getMonth() + 1
     var a6 = pass.getDate()
@@ -91,9 +91,22 @@
         end: [a1,a2,a3], // 结束时间
         style: {
             top: '120px',
-            width: '95%',
+            left: '3%',
+            width: '94%',
             btnLocation: 'bottom',
-            radius: '10px'
+            radius: '10px',
+            liHeight: 45,
+            btnHeight: 50,
+            btnOffset: '30px',
+            sureBtnColor: '#5bcffe',
+            abolishBtnColor: 'rgb(221, 159, 159)',
+            btnBgColor: 'rgba(141, 240, 128, 0.55)',
+            contentBgColor: '#adf499',
+            contentColor: '#000',
+            titleColor: 'green',
+            lineColor: '#00ff2f',
+            upShadow: 'linear-gradient(to bottom, rgb(14, 140, 14), rgba(14, 140, 14, 0))',
+            downShadow: 'linear-gradient(to top, rgb(14, 140, 14), rgba(14, 140, 14, 0))',
         },
         forbid: {
             week: [0, 1, 1, 1, 1, 1, 0]
@@ -103,12 +116,15 @@
             console.log('取消日期选择');
         },
         success: function(arr) { // 回调函数
+            console.log(arr);
             document.getElementById('date-input').innerHTML = arr;
         }
     });
     new DatePicker({
         inputId: 'date-input2',
         type: 'time', // 选择器类型
+        start: [2, 30], // 开始时间
+        end: [19, 20], // 结束时间
         style: {
             location: 'center',
             radius: '6px'
@@ -121,11 +137,11 @@
     new DatePicker({
         inputId: 'date-input3',
         type: 'dateTime',
-        start: [1920, 1, 1, 12, 45], // 开始时间
-        end: [2120, 1, 1, 12, 45], // 结束时间
+        start: [2120, 2, 2, 2, 20], // 开始时间
+        end: [2120, 4, 4, 5, 50], // 结束时间
         style: {
             location: 'center',
-            radius: '4px'
+            radius: '4px',
         },
         hasSuffix: 'no', // 不添加时间单位
         hasZero: 'no', // 单位数不显两位
@@ -139,6 +155,16 @@
         data: city, // 符合格式的 json 数据
         cancel: function () {
             console.log('取消城市选择');
+        },
+        style: {
+            top: '120px',
+            left: '3%',
+            width: '94%',
+            btnLocation: 'bottom',
+            radius: '10px',
+            liHeight: 45,
+            btnHeight: 50,
+            btnOffset: '70px',
         },
         success: function(arr) {
             console.log(arr);
